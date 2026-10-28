@@ -1,0 +1,3 @@
+{
+  "rewrites": [{ "source": "/rider-rush", "destination": "/index.html" }]
+}

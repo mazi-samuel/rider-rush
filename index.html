@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Routag Delivery Challenge</title>
+<style>
+:root{
+  --bg:#0b1220; --panel:#131d33; --panel2:#1b2845; --line:#2a3a5e;
+  --text:#eef3ff; --muted:#93a3c7;
+  --accent:#ff6a1a; --accent2:#19d3a2; --bad:#ff4d5e; --gold:#ffc83d;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;overflow:hidden;user-select:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;padding:clamp(12px,2.4vh,28px) clamp(14px,3vw,40px);
+  background:radial-gradient(1200px 700px at 80% -10%,#1c2b52 0,transparent 60%),var(--bg);overflow:auto}
+.screen.active{display:flex}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;color:var(--accent)}
+.brand i{font-style:normal;background:var(--accent);color:#fff;border-radius:8px;padding:2px 9px;letter-spacing:0}
+h1{margin:.2em 0 .1em;font-size:clamp(30px,6vh,64px);line-height:1.05}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);font-size:clamp(14px,2.2vh,22px);margin:0 0 clamp(10px,2vh,24px)}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,2vw,24px)}
+.mode{background:linear-gradient(160deg,var(--panel2),var(--panel));border:2px solid var(--line);border-radius:22px;
+  padding:clamp(14px,3vh,34px);text-align:left;transition:transform .12s,border-color .12s}
+.mode:hover,.mode:focus-visible{transform:translateY(-3px);border-color:var(--accent);outline:0}
+.mode .ico{font-size:clamp(36px,7vh,76px)}
+.mode h2{margin:.2em 0;font-size:clamp(20px,3.6vh,36px)}
+.mode p{margin:0;color:var(--muted);font-size:clamp(13px,2vh,19px)}
+.mode .go{display:inline-block;margin-top:clamp(8px,1.6vh,18px);background:var(--accent);color:#fff;font-weight:700;
+  border-radius:999px;padding:.5em 1.3em;font-size:clamp(14px,2.2vh,22px)}
+.boards{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,2vw,24px);margin-top:clamp(10px,2vh,24px)}
+.board{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px 16px}
+.board h3{margin:0 0 6px;font-size:clamp(14px,2.2vh,20px);color:var(--gold)}
+.board ol{margin:0;padding:0;list-style:none}
+.board li{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dashed #22305299;font-size:clamp(13px,2vh,19px)}
+.board li:last-child{border:0}
+.board li b{color:var(--accent2)}
+.board .empty{color:var(--muted);font-style:italic}
+.prizes{margin-top:auto;padding-top:12px;color:var(--muted);text-align:center;font-size:clamp(12px,1.9vh,17px)}
+.prizes b{color:var(--gold)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.pill{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:.35em 1em;font-weight:700;white-space:nowrap}
+.btn{background:var(--accent);color:#fff;font-weight:800;border-radius:16px;padding:.7em 1.6em;font-size:clamp(16px,2.6vh,26px);
+  box-shadow:0 6px 0 #b8470a;transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b8470a}
+.btn.ghost{background:var(--panel2);box-shadow:0 6px 0 #0d1528;color:var(--text)}
+.btn.ghost:active{box-shadow:0 2px 0 #0d1528}
+.center{margin:auto;text-align:center;max-width:900px;width:100%}
+
+/* quiz */
+.qbar{height:12px;background:var(--panel);border-radius:99px;overflow:hidden;margin:10px 0}
+.qbar>div{height:100%;width:100%;background:var(--accent2);transition:width .1s linear,background .3s}
+.qtext{font-size:clamp(22px,4.6vh,46px);font-weight:800;line-height:1.2;margin:clamp(8px,2vh,24px) 0}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,1.6vw,18px)}
+.opt{background:var(--panel2);border:2px solid var(--line);border-radius:18px;padding:clamp(12px,2.6vh,28px);
+  text-align:left;font-size:clamp(16px,2.8vh,28px);font-weight:600;display:flex;gap:12px;align-items:center;transition:transform .1s}
+.opt:hover{border-color:var(--accent)}
+.opt kbd{background:var(--panel);border-radius:8px;padding:.1em .55em;color:var(--accent);font-weight:800;font-family:inherit}
+.opt.right{background:#0f6b53;border-color:var(--accent2)}
+.opt.wrong{background:#6b1f2a;border-color:var(--bad)}
+.opt.dim{opacity:.45}
+.opt:disabled{cursor:default}
+.explain{min-height:3.2em;margin-top:clamp(8px,1.6vh,18px);color:var(--muted);font-size:clamp(14px,2.3vh,22px)}
+.explain b{color:var(--text)}
+
+/* rider */
+#rider{padding:8px 10px}
+.hud{display:flex;align-items:center;gap:12px}
+.hud .score{font-size:clamp(20px,4vh,40px);font-weight:900;color:var(--accent2);min-width:3.4em}
+.hud .score small{font-size:.45em;color:var(--muted);font-weight:700;display:block;margin-top:-4px}
+.hud .obj{flex:1;text-align:center;font-weight:800;font-size:clamp(14px,2.6vh,26px)}
+.hud .time{font-size:clamp(20px,4vh,40px);font-weight:900;min-width:2.4em;text-align:right}
+.tbar{height:10px;background:var(--panel);border-radius:99px;overflow:hidden;margin:6px 0}
+.tbar>div{height:100%;background:var(--accent2);width:100%}
+.stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius:14px}
+.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:#0b1220cc;border-radius:14px;text-align:center;padding:20px}
+.overlay.hide{display:none}
+.overlay .big{font-size:clamp(70px,22vh,220px);font-weight:900;color:var(--accent)}
+.overlay h2{font-size:clamp(24px,5vh,50px);margin:.2em 0}
+.overlay p{color:var(--muted);font-size:clamp(14px,2.4vh,24px);max-width:640px;margin:.3em 0}
+.dpad{display:none;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:6px;width:min(300px,60vw);
+  margin:6px auto 0;height:min(130px,18vh)}
+.dpad button{background:var(--panel2);border:2px solid var(--line);border-radius:14px;font-size:26px}
+.dpad button:active{background:var(--accent)}
+.dpad .u{grid-column:2;grid-row:1}.dpad .l{grid-column:1;grid-row:2}.dpad .d{grid-column:2;grid-row:2}.dpad .r{grid-column:3;grid-row:2}
+@media (pointer:coarse){.dpad{display:grid}}
+
+/* end */
+.end .big{font-size:clamp(70px,20vh,200px);font-weight:900;color:var(--accent2);line-height:1}
+.end .lbl{color:var(--muted);font-size:clamp(16px,2.8vh,28px);margin-bottom:8px}
+.prize{margin:clamp(8px,2vh,22px) auto;background:linear-gradient(90deg,#ffc83d33,#ff6a1a33);border:2px solid var(--gold);
+  border-radius:18px;padding:12px 20px;font-size:clamp(16px,3vh,30px);font-weight:800;max-width:700px}
+.prize.none{background:var(--panel);border-color:var(--line);color:var(--muted);font-weight:600}
+.namerow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+.namerow input{background:var(--panel);border:2px solid var(--line);border-radius:14px;color:var(--text);
+  font:inherit;font-size:clamp(16px,2.6vh,26px);padding:.6em 1em;width:min(320px,80vw);text-align:center;user-select:text}
+.namerow input:focus{outline:0;border-color:var(--accent)}
+.rank{color:var(--gold);font-weight:800;min-height:1.4em;font-size:clamp(15px,2.4vh,24px)}
+.actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.mute{position:fixed;right:10px;bottom:8px;z-index:5;background:var(--panel);border:1px solid var(--line);
+  border-radius:99px;padding:.3em .8em;font-size:14px;opacity:.7}
+@media (max-width:700px){.modes,.boards,.opts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<section id="home" class="screen active">
+  <div class="brand"><i>R</i><span id="brandName">ROUTAG</span></div>
+  <h1>Delivery <span>Challenge</span></h1>
+  <p class="sub">Test your logistics brain, then race the clock as a delivery rider. Top players win merch!</p>
+  <div class="modes">
+    <button class="mode" id="playQuiz">
+      <div class="ico">🧠</div>
+      <h2>Logistics Quiz</h2>
+      <p>10 quick questions on delivery &amp; logistics. Faster answers score more.</p>
+      <span class="go">Play quiz ▶</span>
+    </button>
+    <button class="mode" id="playRider">
+      <div class="ico">🛵</div>
+      <h2>Rider Rush</h2>
+      <p>60 seconds. Pick up parcels, dodge traffic, deliver as many as you can.</p>
+      <span class="go">Start riding ▶</span>
+    </button>
+  </div>
+  <div class="boards">
+    <div class="board"><h3>🏆 Rider Rush: top deliveries</h3><ol id="lbRider"></ol></div>
+    <div class="board"><h3>🏆 Quiz: top scores</h3><ol id="lbQuiz"></ol></div>
+  </div>
+  <div class="prizes" id="prizeLine"></div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz" class="screen">
+  <div class="topbar">
+    <div class="brand"><i>R</i><span class="bn">ROUTAG</span></div>
+    <div class="pill" id="qCount">Q 1/10</div>
+    <div class="pill" id="qScore">0 pts</div>
+  </div>
+  <div class="center">
+    <div class="qbar"><div id="qTimer"></div></div>
+    <div class="qtext" id="qText"></div>
+    <div class="opts" id="qOpts"></div>
+    <div class="explain" id="qExplain"></div>
+  </div>
+</section>
+
+<!-- RIDER -->
+<section id="rider" class="screen">
+  <div class="hud">
+    <div class="score"><span id="rScore">0</span><small>DELIVERIES</small></div>
+    <div class="obj" id="rObj"></div>
+    <div class="time"><span id="rTime">60</span>s</div>
+  </div>
+  <div class="tbar"><div id="rBar"></div></div>
+  <div class="stage">
+    <canvas id="cv"></canvas>
+    <div class="overlay" id="rOverlay">
+      <h2>🛵 Rider Rush</h2>
+      <p><b>Arrow keys / WASD</b> or swipe or tap the arrows to steer.<br>
+         Grab the parcel at <b>🏪</b>, drop it at <b>🏠</b>. Avoid <b>🚗</b> traffic!</p>
+      <button class="btn" id="rStart" style="margin-top:14px">GO!</button>
+    </div>
+  </div>
+  <div class="dpad">
+    <button class="u" data-d="up">▲</button><button class="l" data-d="left">◀</button>
+    <button class="d" data-d="down">▼</button><button class="r" data-d="right">▶</button>
+  </div>
+</section>
+
+<!-- END -->
+<section id="end" class="screen end">
+  <div class="center">
+    <div class="brand" style="justify-content:center"><i>R</i><span class="bn">ROUTAG</span></div>
+    <h1 id="eTitle">Time's up!</h1>
+    <div class="big" id="eBig">0</div>
+    <div class="lbl" id="eLbl"></div>
+    <div class="prize" id="ePrize"></div>
+    <div class="namerow" id="eNameRow">
+      <input id="eName" maxlength="14" placeholder="Your name for the leaderboard" autocomplete="off">
+      <button class="btn" id="eSave">Save score</button>
+    </div>
+    <div class="rank" id="eRank"></div>
+    <div class="actions">
+      <button class="btn" id="eAgain">Play again</button>
+      <button class="btn ghost" id="eHome">Home</button>
+    </div>
+  </div>
+</section>
+
+<button class="mute" id="mute" title="Toggle sound">🔊</button>
+
+<script>
+/* ============ CONFIG: edit freely ============ */
+const CONFIG = {
+  brand: 'ROUTAG',
+  riderSeconds: 60,
+  quizQuestions: 10,
+  quizSeconds: 15,
+  // highest matching tier wins. Rename prizes to whatever is on your booth.
+  riderTiers: [
+    { min: 8, prize: '🎁 Premium merch pack' },
+    { min: 5, prize: '👕 Branded tee or cap' },
+    { min: 3, prize: '🎟️ Sticker & keyring' },
+  ],
+  quizTiers: [   // by number of correct answers
+    { min: 9, prize: '🎁 Premium merch pack' },
+    { min: 7, prize: '👕 Branded tee or cap' },
+    { min: 5, prize: '🎟️ Sticker & keyring' },
+  ],
+  idleSeconds: 45,   // end screen returns home after this long
+};
+
+/* ============ QUESTIONS ============ */
+// a[0] is always the correct answer in the source; options are shuffled at runtime.
+const QUESTIONS = [
+  { q:'What is "last-mile delivery"?', a:['The final leg from a hub to the customer\'s door','The first leg from factory to warehouse','Delivery over exactly one mile','Shipping across borders'], e:'Last mile is the final step of the journey, and usually the costliest.' },
+  { q:'What does POD stand for in delivery?', a:['Proof of Delivery','Point of Dispatch','Package on Demand','Pickup Order Docket'], e:'POD (signature, photo or OTP) confirms the parcel reached the customer.' },
+  { q:'What is a 3PL?', a:['A third-party logistics provider','A three-wheel pickup lorry','A 3-point loading layout','A triple-priority label'], e:'3PLs handle warehousing, transport and fulfilment on behalf of a business.' },
+  { q:'Which leg of the delivery journey is typically the most expensive?', a:['Last mile','First mile','Line-haul','Customs clearance'], e:'Many stops, traffic and failed attempts make last mile the costliest leg.' },
+  { q:'What does a TMS do?', a:['Plans and manages transportation','Manages shelf stock in a store','Tracks employee time','Prints shipping labels only'], e:'A Transport Management System plans, executes and tracks freight movement.' },
+  { q:'What does a WMS manage?', a:['Warehouse operations and inventory','Weather and mileage stats','Wage and maintenance spend','Wholesale marketing sales'], e:'A Warehouse Management System controls storage, picking and packing.' },
+  { q:'What is route optimisation?', a:['Finding the most efficient order of stops','Choosing the prettiest road','Adding more stops to a route','Using only highways'], e:'It cuts distance, time and fuel, so riders complete more deliveries.' },
+  { q:'What is cross-docking?', a:['Moving goods from inbound to outbound trucks with little or no storage','Stacking pallets two high','Shipping goods across a river','Docking a vehicle for repairs'], e:'Cross-docking speeds up flow by skipping long-term warehouse storage.' },
+  { q:'What does SKU stand for?', a:['Stock Keeping Unit','Safe Keeping Utility','Standard Kilo Unit','Shipment Key Upload'], e:'A SKU is a unique code identifying each product variant in inventory.' },
+  { q:'What is reverse logistics?', a:['Handling returns and sending goods back','Driving a truck backwards','Delivering from customer to customer only','Unloading from the rear'], e:'Returns, repairs and recycling all flow "backwards" through the supply chain.' },
+  { q:'In freight, what does LTL mean?', a:['Less Than Truckload','Long Term Loading','Local Transit Line','Last Truck Left'], e:'LTL shares truck space between several shippers\' smaller consignments.' },
+  { q:'What is a geofence?', a:['A virtual boundary that triggers alerts when a vehicle enters or leaves','A fence around a warehouse','A GPS satellite','A road toll gate'], e:'Geofences automatically flag arrivals, departures and off-route detours.' },
+  { q:'What does ETA mean?', a:['Estimated Time of Arrival','Exact Transit Address','Extra Trip Allowance','End of Transit Area'], e:'Accurate live ETAs reduce "where is my order?" calls.' },
+  { q:'What is a Bill of Lading?', a:['A carrier document listing the goods shipped, acting as a receipt','A fuel invoice','A driver\'s licence','A warehouse floor plan'], e:'It is both a receipt and a contract of carriage for the shipment.' },
+  { q:'"First-attempt delivery rate" measures…', a:['The share of parcels delivered successfully on the first try','How fast a rider starts','The first parcel of the day','Warehouse picking speed'], e:'Higher first-attempt success means fewer costly re-deliveries.' },
+  { q:'What is "dwell time"?', a:['Time a vehicle or shipment sits idle, e.g. at a dock or stop','Time to write a report','A driver\'s break entitlement','Delivery warranty period'], e:'Long dwell time wastes money, so cutting it frees up capacity.' },
+  { q:'In dropshipping, who ships the product to the customer?', a:['The supplier, directly','The customer collects it','The seller from their own warehouse','A random courier chosen by the buyer'], e:'The seller never holds stock; the supplier ships on their behalf.' },
+  { q:'What are Incoterms?', a:['Standard international trade terms defining buyer and seller duties','Internet shipping protocols','Insurance terms for couriers','Import tax codes'], e:'Terms like FOB and CIF say who pays for and risks goods at each stage.' },
+  { q:'Which most helps reduce failed deliveries?', a:['Live tracking and customer notifications','Delivering only at night','Using bigger vehicles','Removing delivery addresses'], e:'When customers know the ETA, they are home to receive the parcel.' },
+  { q:'What is vehicle telematics?', a:['GPS plus vehicle data used to monitor a fleet','A type of tyre','A driver payroll tool','A truck loading ramp'], e:'It reports location, speed, idling and driving behaviour in real time.' },
+  { q:'What is a "milk run"?', a:['A fixed route collecting from several suppliers or stops','A dairy-only delivery','A same-day express service','A route with no stops'], e:'Milk runs consolidate pickups to avoid many half-empty trips.' },
+  { q:'Which network model routes parcels through a central point to regional branches?', a:['Hub-and-spoke','Point-to-point','Zig-zag','Open-loop'], e:'Hub-and-spoke concentrates sorting in one place, then fans out.' },
+  { q:'What does OTIF measure?', a:['Deliveries On Time and In Full','Orders Tracked In Fleet','Online Tracking Interface Fee','Orders Taken In February'], e:'OTIF is a core service metric: right goods, right quantity, right time.' },
+  { q:'The "Vehicle Routing Problem" is about…', a:['Finding the best routes for a fleet serving many customers','Choosing a vehicle colour','Fixing a broken route','Registering vehicles'], e:'It is the classic puzzle behind route-planning software like Routag.' },
+];
+
+/* ============ HELPERS ============ */
+const $ = id => document.getElementById(id);
+const rnd = n => Math.floor(Math.random() * n);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const store = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+};
+let muted = false, AC;
+function beep(f, d = .1, type = 'sine', v = .12, delay = 0) {
+  if (muted) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const t = AC.currentTime + delay, o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.value = f; g.gain.setValueAtTime(v, t);
+    g.gain.exponentialRampToValueAtTime(.001, t + d);
+    o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + d);
+  } catch (e) {}
+}
+const sfx = {
+  good: () => { beep(660, .1); beep(880, .15, 'sine', .12, .1); },
+  bad: () => beep(160, .3, 'sawtooth', .1),
+  tick: () => beep(520, .06, 'square', .05),
+  go: () => beep(988, .35, 'square', .08),
+  deliver: () => { beep(523, .1); beep(659, .1, 'sine', .12, .09); beep(784, .2, 'sine', .12, .18); },
+  pickup: () => beep(740, .12, 'triangle', .14),
+  crash: () => beep(110, .25, 'sawtooth', .15),
+  end: () => { beep(784, .15); beep(659, .15, 'sine', .12, .15); beep(523, .3, 'sine', .12, .3); },
+};
+$('mute').onclick = () => { muted = !muted; $('mute').textContent = muted ? '🔇' : '🔊'; };
+
+let idleTimer;
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+  clearTimeout(idleTimer);
+  if (id === 'end') idleTimer = setTimeout(() => goHome(), CONFIG.idleSeconds * 1000);
+}
+function tierFor(tiers, v) { return tiers.find(t => v >= t.min); }
+
+/* ============ LEADERBOARD ============ */
+const LB_KEYS = { rider: 'routag_lb_rider', quiz: 'routag_lb_quiz' };
+function addScore(kind, name, score) {
+  const lb = store.get(LB_KEYS[kind], []);
+  const entry = { name: name || 'Guest', score, ts: Date.now() };
+  lb.push(entry);
+  lb.sort((a, b) => b.score - a.score || a.ts - b.ts);
+  store.set(LB_KEYS[kind], lb.slice(0, 50));
+  return lb.indexOf(entry) + 1;
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function renderBoards() {
+  for (const [kind, el] of [['rider', 'lbRider'], ['quiz', 'lbQuiz']]) {
+    const lb = store.get(LB_KEYS[kind], []).slice(0, 5);
+    $(el).innerHTML = lb.length
+      ? lb.map((e, i) => `<li><span>${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'} ${esc(e.name)}</span><b>${e.score}</b></li>`).join('')
+      : '<li class="empty">No scores yet. Be the first!</li>';
+  }
+  const r = CONFIG.riderTiers[CONFIG.riderTiers.length - 1], top = CONFIG.riderTiers[0];
+  $('prizeLine').innerHTML = `Rider Rush: <b>${r.min}+</b> deliveries wins something, <b>${top.min}+</b> wins the top prize.`
+    + ` Quiz: <b>${CONFIG.quizTiers[CONFIG.quizTiers.length - 1].min}+</b> correct wins something.`;
+}
+function goHome() { stopRider(); clearInterval(qInt); show('home'); renderBoards(); }
+
+/* ============ END SCREEN ============ */
+let endCtx = null;
+function showEnd(ctx) {
+  endCtx = ctx;
+  $('eTitle').textContent = ctx.title;
+  $('eBig').textContent = ctx.big;
+  $('eLbl').textContent = ctx.label;
+  const tier = tierFor(ctx.tiers, ctx.tierValue);
+  const p = $('ePrize');
+  p.className = 'prize' + (tier ? '' : ' none');
+  p.textContent = tier ? `You win: ${tier.prize}. Show this screen at the booth!` : 'So close! Play again to win merch.';
+  $('eName').value = ''; $('eName').disabled = false; $('eSave').disabled = false;
+  $('eNameRow').style.display = ''; $('eRank').textContent = '';
+  show('end');
+  if (tier) sfx.good(); else sfx.end();
+}
+function saveEnd() {
+  if (!endCtx || endCtx.saved) return;
+  endCtx.saved = true;
+  const rank = addScore(endCtx.kind, $('eName').value.trim(), endCtx.score);
+  $('eName').disabled = true; $('eSave').disabled = true;
+  $('eRank').textContent = `Saved! You're #${rank} on the leaderboard 🎉`;
+  clearTimeout(idleTimer); idleTimer = setTimeout(goHome, CONFIG.idleSeconds * 1000);
+}
+$('eSave').onclick = saveEnd;
+$('eName').addEventListener('keydown', e => { if (e.key === 'Enter') saveEnd(); });
+$('eHome').onclick = goHome;
+$('eAgain').onclick = () => endCtx && (endCtx.kind === 'quiz' ? startQuiz() : startRider());
+
+/* ============ QUIZ ============ */
+let qSet = [], qi = 0, qCorrect = 0, qPoints = 0, qLeft = 0, qInt, qLocked = false;
+function startQuiz() {
+  qSet = shuffle(QUESTIONS).slice(0, CONFIG.quizQuestions);
+  qi = 0; qCorrect = 0; qPoints = 0;
+  show('quiz'); nextQ();
+}
+function nextQ() {
+  if (qi >= qSet.length) return endQuiz();
+  const item = qSet[qi];
+  const opts = shuffle(item.a.map((t, i) => ({ t, ok: i === 0 })));
+  item.cur = opts;
+  qLocked = false;
+  $('qCount').textContent = `Q ${qi + 1}/${qSet.length}`;
+  $('qScore').textContent = `${qPoints} pts`;
+  $('qText').textContent = item.q;
+  $('qExplain').textContent = '';
+  $('qOpts').innerHTML = opts.map((o, i) =>
+    `<button class="opt" data-i="${i}"><kbd>${i + 1}</kbd><span>${esc(o.t)}</span></button>`).join('');
+  $('qOpts').querySelectorAll('.opt').forEach(b => b.onclick = () => answer(+b.dataset.i));
+  qLeft = CONFIG.quizSeconds;
+  updQTimer();
+  clearInterval(qInt);
+  qInt = setInterval(() => {
+    qLeft -= .1; updQTimer();
+    if (qLeft <= 0) { clearInterval(qInt); answer(-1); }
+  }, 100);
+}
+function updQTimer() {
+  const f = Math.max(0, qLeft / CONFIG.quizSeconds);
+  const el = $('qTimer');
+  el.style.width = (f * 100) + '%';
+  el.style.background = f < .3 ? 'var(--bad)' : 'var(--accent2)';
+}
+function answer(i) {
+  if (qLocked) return;
+  qLocked = true; clearInterval(qInt);
+  const item = qSet[qi], opts = item.cur;
+  const ok = i >= 0 && opts[i].ok;
+  if (ok) { qCorrect++; qPoints += 100 + Math.round(50 * Math.max(0, qLeft) / CONFIG.quizSeconds); sfx.good(); } else sfx.bad();
+  $('qScore').textContent = `${qPoints} pts`;
+  $('qOpts').querySelectorAll('.opt').forEach((b, n) => {
+    b.disabled = true;
+    if (opts[n].ok) b.classList.add('right');
+    else if (n === i) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+  $('qExplain').innerHTML = (ok ? '<b>✅ Correct!</b> ' : i < 0 ? '<b>⏱ Time\'s up.</b> ' : '<b>❌ Not quite.</b> ') + esc(item.e);
+  qi++;
+  setTimeout(nextQ, ok ? 1600 : 2400);
+}
+function endQuiz() {
+  showEnd({
+    kind: 'quiz', title: 'Quiz complete!', big: qCorrect + '/' + qSet.length,
+    label: `${qPoints} points`, score: qPoints, tiers: CONFIG.quizTiers, tierValue: qCorrect,
+  });
+}
+document.addEventListener('keydown', e => {
+  if ($('quiz').classList.contains('active') && !qLocked && /^[1-4]$/.test(e.key)) answer(+e.key - 1);
+});
+
+/* ============ RIDER RUSH ============ */
+const COLS = 17, ROWS = 11, S = 56;
+const cv = $('cv'), ctx = cv.getContext('2d');
+cv.width = COLS * S; cv.height = ROWS * S;
+const isRoad = (x, y) => x >= 0 && y >= 0 && x < COLS && y < ROWS && (x % 2 === 0 || y % 2 === 0);
+const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+const BCOL = ['#2c3d66', '#33477a', '#2a4a5e', '#3a3f73', '#2f5266', '#40386b'];
+const bHash = (x, y) => (x * 73856093 ^ y * 19349663) >>> 0;
+
+let R = null, raf = 0, phase = 'idle';
+function newGame() {
+  R = {
+    cx: 8, cy: 4, dx: 0, dy: 0, t: 0, want: null, face: 1,
+    stun: 0, inv: 0, hasParcel: false, delivered: 0, timeLeft: CONFIG.riderSeconds,
+    cars: [], fx: [], target: null, last: 0, shake: 0,
+  };
+  for (let i = 0; i < 6; i++) spawnCar();
+  setTarget();
+}
+function spot(from, minD) {
+  for (let n = 0; n < 500; n++) {
+    const x = rnd(COLS), y = rnd(ROWS);
+    if (isRoad(x, y) && (x % 2) !== (y % 2) && Math.abs(x - from.x) + Math.abs(y - from.y) >= minD) return { x, y };
+  }
+  return { x: 0, y: 1 };
+}
+function setTarget() {
+  if (R.hasParcel) R.target = { ...spot(R.target || { x: R.cx, y: R.cy }, 8), kind: 'drop' };
+  else R.target = { ...spot({ x: R.cx, y: R.cy }, 5), kind: 'pick' };
+  $('rObj').textContent = R.hasParcel ? '📦 Deliver to 🏠' : '➡️ Pick up at 🏪';
+}
+function spawnCar() {
+  for (let n = 0; n < 50; n++) {
+    const cx = rnd(Math.ceil(COLS / 2)) * 2, cy = rnd(Math.ceil(ROWS / 2)) * 2;
+    if (isRoad(cx, cy) && Math.abs(cx - R.cx) + Math.abs(cy - R.cy) > 6) {
+      const c = { cx, cy, dx: 0, dy: 0, t: 0, emoji: ['🚗', '🚕', '🚙', '🚌', '🚚'][rnd(5)] };
+      carPick(c); R.cars.push(c); return;
+    }
+  }
+}
+function carPick(c) {
+  const opts = Object.values(DIRS).filter(([dx, dy]) => isRoad(c.cx + dx, c.cy + dy) && !(dx === -c.dx && dy === -c.dy));
+  [c.dx, c.dy] = opts[rnd(opts.length)] || [-c.dx, -c.dy];
+}
+function setWant(name) { if (R && phase === 'play') R.want = DIRS[name]; }
+
+function stepRider(dt) {
+  const r = R;
+  if (r.stun > 0) { r.stun -= dt; }
+  else {
+    // reverse mid-block
+    if (r.want && (r.dx || r.dy) && r.want[0] === -r.dx && r.want[1] === -r.dy) {
+      r.cx += r.dx; r.cy += r.dy; r.dx = -r.dx; r.dy = -r.dy; r.t = 1 - r.t;
+    }
+    if (!r.dx && !r.dy && r.want && isRoad(r.cx + r.want[0], r.cy + r.want[1])) [r.dx, r.dy] = r.want;
+    if (r.dx || r.dy) {
+      r.t += 5.4 * dt;
+      while (r.t >= 1) {
+        r.t -= 1; r.cx += r.dx; r.cy += r.dy;
+        arrive();
+        if (r.want && isRoad(r.cx + r.want[0], r.cy + r.want[1])) [r.dx, r.dy] = r.want;
+        else if (!isRoad(r.cx + r.dx, r.cy + r.dy)) { r.dx = r.dy = 0; r.t = 0; break; }
+      }
+      if (r.dx) r.face = r.dx;
+    }
+  }
+  if (r.inv > 0) r.inv -= dt;
+  if (r.shake > 0) r.shake -= dt;
+  // cars
+  for (const c of r.cars) {
+    c.t += 2.7 * dt;
+    while (c.t >= 1) { c.t -= 1; c.cx += c.dx; c.cy += c.dy; carPick(c); }
+    if (r.inv <= 0 && r.stun <= 0) {
+      const rx = r.cx + r.dx * r.t, ry = r.cy + r.dy * r.t;
+      const px = c.cx + c.dx * c.t, py = c.cy + c.dy * c.t;
+      if (Math.hypot(rx - px, ry - py) < .6) {
+        r.stun = 1.1; r.inv = 2.4; r.shake = .4; r.dx = r.dy = 0; r.t = 0; r.want = null;
+        fx(rx, ry, '💥 Bump!', '#ff4d5e'); sfx.crash();
+      }
+    }
+  }
+  r.fx.forEach(f => f.life -= dt); r.fx = r.fx.filter(f => f.life > 0);
+}
+function fx(x, y, text, color) { R.fx.push({ x, y, text, color, life: 1 }); }
+function arrive() {
+  const r = R, t = r.target;
+  if (t && r.cx === t.x && r.cy === t.y) {
+    if (t.kind === 'pick') { r.hasParcel = true; fx(t.x, t.y, '📦 Picked up!', '#ffc83d'); sfx.pickup(); }
+    else {
+      r.hasParcel = false; r.delivered++; $('rScore').textContent = r.delivered;
+      fx(t.x, t.y, '+1 Delivered!', '#19d3a2'); sfx.deliver();
+    }
+    setTarget();
+  }
+}
+
+function drawRider(now) {
+  const r = R, g = ctx;
+  g.save();
+  if (r.shake > 0) g.translate((Math.random() - .5) * 8, (Math.random() - .5) * 8);
+  g.fillStyle = '#10192e'; g.fillRect(0, 0, cv.width, cv.height);
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
+    if (isRoad(x, y)) {
+      g.fillStyle = '#3b4560'; g.fillRect(x * S, y * S, S, S);
+    } else {
+      g.fillStyle = '#2a3a2f'; g.fillRect(x * S, y * S, S, S);
+      const h = bHash(x, y), p = 7;
+      g.fillStyle = BCOL[h % BCOL.length];
+      g.beginPath(); g.roundRect(x * S + p, y * S + p, S - 2 * p, S - 2 * p, 8); g.fill();
+      g.fillStyle = '#ffe9a655';
+      for (let k = 0; k < 4; k++) if ((h >> k) & 1) g.fillRect(x * S + p + 6 + (k % 2) * 16, y * S + p + 6 + (k >> 1) * 14, 8, 7);
+    }
+  }
+  // lane dashes
+  g.strokeStyle = '#ffffff30'; g.lineWidth = 2; g.setLineDash([8, 10]);
+  for (let y = 0; y < ROWS; y += 2) { g.beginPath(); g.moveTo(0, y * S + S / 2); g.lineTo(cv.width, y * S + S / 2); g.stroke(); }
+  for (let x = 0; x < COLS; x += 2) { g.beginPath(); g.moveTo(x * S + S / 2, 0); g.lineTo(x * S + S / 2, cv.height); g.stroke(); }
+  g.setLineDash([]);
+
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  // target
+  const t = r.target, pulse = 1 + Math.sin(now / 160) * .12;
+  const tx = t.x * S + S / 2, ty = t.y * S + S / 2;
+  g.fillStyle = t.kind === 'pick' ? '#ffc83d55' : '#19d3a255';
+  g.beginPath(); g.arc(tx, ty, S * .62 * pulse, 0, 7); g.fill();
+  g.strokeStyle = t.kind === 'pick' ? '#ffc83d' : '#19d3a2'; g.lineWidth = 3; g.stroke();
+  g.font = `${S * .72}px "Segoe UI Emoji","Apple Color Emoji",sans-serif`;
+  g.fillText(t.kind === 'pick' ? '🏪' : '🏠', tx, ty + 2);
+
+  // cars
+  for (const c of r.cars) {
+    g.save(); g.translate((c.cx + c.dx * c.t) * S + S / 2, (c.cy + c.dy * c.t) * S + S / 2);
+    if (c.dx > 0) g.scale(-1, 1);
+    g.font = `${S * .62}px "Segoe UI Emoji","Apple Color Emoji",sans-serif`;
+    g.fillText(c.emoji, 0, 2); g.restore();
+  }
+  // rider
+  const px = (r.cx + r.dx * r.t) * S + S / 2, py = (r.cy + r.dy * r.t) * S + S / 2;
+  if (r.inv > 0 && Math.floor(now / 90) % 2) g.globalAlpha = .45;
+  g.save(); g.translate(px, py);
+  g.fillStyle = '#00000044'; g.beginPath(); g.ellipse(0, S * .22, S * .3, S * .1, 0, 0, 7); g.fill();
+  if (r.face > 0) g.scale(-1, 1); // 🛵 faces left by default
+  g.font = `${S * .72}px "Segoe UI Emoji","Apple Color Emoji",sans-serif`;
+  g.fillText('🛵', 0, 0); g.restore();
+  g.globalAlpha = 1;
+  if (r.hasParcel) { g.font = `${S * .4}px "Segoe UI Emoji","Apple Color Emoji",sans-serif`; g.fillText('📦', px, py - S * .5); }
+  if (r.stun > 0) { g.font = `${S * .45}px "Segoe UI Emoji","Apple Color Emoji",sans-serif`; g.fillText('💫', px, py - S * .5); }
+
+  // floating text
+  g.font = `800 ${S * .34}px "Segoe UI",sans-serif`;
+  for (const f of r.fx) {
+    g.globalAlpha = Math.min(1, f.life * 1.6);
+    g.fillStyle = f.color; g.strokeStyle = '#000a'; g.lineWidth = 4;
+    const fy = f.y * S + S / 2 - (1 - f.life) * S * 1.2 - S * .6;
+    g.strokeText(f.text, f.x * S + S / 2, fy); g.fillText(f.text, f.x * S + S / 2, fy);
+  }
+  g.globalAlpha = 1; g.restore();
+}
+
+let lastSec = -1;
+function loop(now) {
+  if (phase !== 'play') return;
+  const dt = Math.min(.05, (now - R.last) / 1000 || 0);
+  R.last = now;
+  R.timeLeft -= dt;
+  stepRider(dt);
+  const secs = Math.max(0, Math.ceil(R.timeLeft));
+  $('rTime').textContent = secs;
+  $('rBar').style.width = (Math.max(0, R.timeLeft) / CONFIG.riderSeconds * 100) + '%';
+  $('rBar').style.background = R.timeLeft < 10 ? 'var(--bad)' : 'var(--accent2)';
+  if (secs !== lastSec) { lastSec = secs; if (secs <= 5 && secs > 0) sfx.tick(); }
+  drawRider(now);
+  if (R.timeLeft <= 0) return endRider();
+  raf = requestAnimationFrame(loop);
+}
+function startRider() {
+  stopRider();
+  newGame(); phase = 'ready';
+  $('rScore').textContent = 0; $('rTime').textContent = CONFIG.riderSeconds;
+  $('rBar').style.width = '100%'; $('rBar').style.background = 'var(--accent2)';
+  show('rider');
+  drawRider(performance.now());
+  const ov = $('rOverlay');
+  ov.className = 'overlay';
+  ov.innerHTML = `<h2>🛵 Rider Rush</h2>
+    <p><b>Arrow keys / WASD</b>, swipe, or tap the arrows to steer.<br>
+    Grab the parcel at <b>🏪</b>, drop it at <b>🏠</b>. Avoid <b>🚗</b> traffic!<br>
+    You have <b>${CONFIG.riderSeconds} seconds</b>. How many can you deliver?</p>
+    <button class="btn" id="rStart" style="margin-top:14px">GO!</button>`;
+  $('rStart').onclick = countdown;
+}
+function countdown() {
+  const ov = $('rOverlay');
+  let n = 3;
+  const tick = () => {
+    if (phase !== 'ready') return;
+    if (n > 0) { ov.innerHTML = `<div class="big">${n}</div>`; sfx.tick(); n--; setTimeout(tick, 800); }
+    else { ov.innerHTML = '<div class="big">GO!</div>'; sfx.go(); setTimeout(() => ov.classList.add('hide'), 450); begin(); }
+  };
+  tick();
+}
+function begin() {
+  phase = 'play'; R.last = performance.now(); lastSec = -1;
+  raf = requestAnimationFrame(loop);
+}
+function stopRider() { phase = 'idle'; cancelAnimationFrame(raf); }
+function endRider() {
+  const d = R.delivered;
+  stopRider(); sfx.end();
+  $('rOverlay').className = 'overlay';
+  $('rOverlay').innerHTML = `<h2>⏱ Time's up!</h2><p>You delivered ${d} parcel${d === 1 ? '' : 's'}.</p>`;
+  setTimeout(() => showEnd({
+    kind: 'rider', title: "Time's up!", big: d, label: d === 1 ? 'delivery in 60 seconds' : 'deliveries in 60 seconds',
+    score: d, tiers: CONFIG.riderTiers, tierValue: d,
+  }), 1400);
+}
+
+// input
+const KEYMAP = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', w: 'up', s: 'down', a: 'left', d: 'right', W: 'up', S: 'down', A: 'left', D: 'right' };
+document.addEventListener('keydown', e => {
+  if ($('rider').classList.contains('active')) {
+    if (KEYMAP[e.key]) { e.preventDefault(); setWant(KEYMAP[e.key]); }
+    if ((e.key === 'Enter' || e.key === ' ') && phase === 'ready' && $('rStart')) { e.preventDefault(); countdown(); }
+  }
+});
+document.querySelectorAll('.dpad button').forEach(b => {
+  const h = e => { e.preventDefault(); setWant(b.dataset.d); };
+  b.addEventListener('touchstart', h, { passive: false }); b.addEventListener('mousedown', h);
+});
+let sw = null;
+cv.addEventListener('touchstart', e => { const t = e.touches[0]; sw = [t.clientX, t.clientY]; }, { passive: true });
+cv.addEventListener('touchmove', e => {
+  if (!sw) return; const t = e.touches[0], dx = t.clientX - sw[0], dy = t.clientY - sw[1];
+  if (Math.hypot(dx, dy) > 24) {
+    setWant(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
+    sw = [t.clientX, t.clientY];
+  }
+}, { passive: true });
+cv.addEventListener('touchend', () => sw = null);
+
+/* ============ BOOT ============ */
+document.querySelectorAll('.bn,#brandName').forEach(el => el.textContent = CONFIG.brand);
+$('playQuiz').onclick = startQuiz;
+$('playRider').onclick = startRider;
+// booth admin: Ctrl+Shift+L clears both leaderboards, Esc returns home
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'l') {
+    if (confirm('Clear ALL leaderboard scores?')) { localStorage.removeItem(LB_KEYS.rider); localStorage.removeItem(LB_KEYS.quiz); renderBoards(); }
+  }
+  if (e.key === 'Escape' && !$('home').classList.contains('active') && document.activeElement !== $('eName')) goHome();
+});
+renderBoards();
+</script>
+</body>
+</html>
