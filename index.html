@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Routag Delivery Challenge</title>
+<meta name="description" content="Logistics games: quiz, rider rush, word match, pack it and route planner.">
+<meta name="theme-color" content="#0b1220">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Routag">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <style>
 :root{
   --bg:#0b1220; --panel:#131d33; --panel2:#1b2845; --line:#2a3a5e;
@@ -14,36 +23,55 @@
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
   font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;overflow:hidden;user-select:none}
 button{font:inherit;color:inherit;cursor:pointer;border:0}
-.screen{position:absolute;inset:0;display:none;flex-direction:column;padding:clamp(12px,2.4vh,28px) clamp(14px,3vw,40px);
+.screen{position:fixed;inset:0;display:none;flex-direction:column;padding:clamp(12px,calc(2.4*var(--vh,1vh)),28px) clamp(14px,3vw,40px);
   background:radial-gradient(1200px 700px at 80% -10%,#1c2b52 0,transparent 60%),var(--bg);overflow:auto}
 .screen.active{display:flex}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;color:var(--accent)}
 .brand i{font-style:normal;background:var(--accent);color:#fff;border-radius:8px;padding:2px 9px;letter-spacing:0}
-h1{margin:.2em 0 .1em;font-size:clamp(30px,6vh,64px);line-height:1.05}
+h1{margin:.2em 0 .1em;font-size:clamp(30px,calc(6*var(--vh,1vh)),64px);line-height:1.05}
 h1 span{color:var(--accent)}
-.sub{color:var(--muted);font-size:clamp(14px,2.2vh,22px);margin:0 0 clamp(10px,2vh,24px)}
-.modes{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,2vw,24px)}
-.mode{background:linear-gradient(160deg,var(--panel2),var(--panel));border:2px solid var(--line);border-radius:22px;
-  padding:clamp(14px,3vh,34px);text-align:left;transition:transform .12s,border-color .12s}
+.sub{color:var(--muted);font-size:clamp(14px,calc(2.2*var(--vh,1vh)),22px);margin:0 0 clamp(10px,calc(2*var(--vh,1vh)),24px)}
+.hhead{display:flex;flex-direction:column;align-items:flex-start}
+.modes{flex:1;min-height:0;display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:1fr;gap:clamp(8px,1.6vw,20px)}
+.mode{container-type:size;display:flex;align-items:center;gap:clamp(10px,2cqw,22px);min-height:0;overflow:hidden;grid-column:span 2;
+  background:linear-gradient(160deg,var(--panel2),var(--panel));border:2px solid var(--line);border-radius:20px;
+  padding:0 clamp(12px,2cqw,26px);text-align:left;transition:transform .12s,border-color .12s}
+.mode:nth-child(n+4){grid-column:span 3}
 .mode:hover,.mode:focus-visible{transform:translateY(-3px);border-color:var(--accent);outline:0}
-.mode .ico{font-size:clamp(32px,5.5vh,64px)}
-.mode h2{margin:.2em 0;font-size:clamp(20px,3.6vh,36px)}
-.mode p{margin:0;color:var(--muted);font-size:clamp(13px,2vh,19px)}
-.mode .go{display:inline-block;margin-top:clamp(8px,1.6vh,18px);background:var(--accent);color:#fff;font-weight:700;
-  border-radius:999px;padding:.5em 1.3em;font-size:clamp(14px,2.2vh,22px)}
-.boards{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,2vw,24px);margin-top:clamp(10px,2vh,24px)}
-.board{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px 16px}
-.board h3{margin:0 0 6px;font-size:clamp(14px,2.2vh,20px);color:var(--gold)}
-.board ol{margin:0;padding:0;list-style:none}
-.board li{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dashed #22305299;font-size:clamp(13px,2vh,19px)}
-.board li:last-child{border:0}
-.board li b{color:var(--accent2)}
-.board .empty{color:var(--muted);font-style:italic}
-.prizes{margin-top:auto;padding-top:12px;color:var(--muted);text-align:center;font-size:clamp(12px,1.9vh,17px)}
-.prizes b{color:var(--gold)}
+.mode .ico{font-size:56px;line-height:1;flex:none}
+.mode .txt{min-width:0}
+.mode h2{margin:0 0 .15em;font-size:26px;line-height:1.1}
+.mode p{margin:0;color:var(--muted);font-size:15px;line-height:1.25}
+.mode .go{display:inline-block;margin-top:.6em;background:var(--accent);color:#fff;font-weight:700;border-radius:999px;padding:.35em 1.1em;font-size:15px}
+@container (max-height:150px){.mode .ico{font-size:42px}.mode h2{font-size:21px}.mode p{font-size:13px}.mode .go{display:none}}
+@container (max-height:100px){.mode .ico{font-size:32px}.mode h2{font-size:18px}.mode p{font-size:12px}}
+@container (max-height:78px){.mode .ico{font-size:28px}.mode h2{font-size:17px;margin:0}.mode p{display:none}}
+@container (max-width:250px){.mode p,.mode .go{display:none}.mode .ico{font-size:30px}.mode h2{font-size:17px;margin:0}}
+.lb{margin-top:clamp(8px,calc(1.6*var(--vh,1vh)),18px);background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:8px 12px}
+.lbtabs{display:flex;gap:6px;margin-bottom:6px}
+.lbtab{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:.3em .5em;font-weight:700;
+  font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.lbtab .n{display:none}
+.lbtab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.lbhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;color:var(--gold);font-weight:800;font-size:15px}
+.lbhead span{color:var(--muted);font-weight:600;font-size:13px}
+.lbhead span b{color:var(--gold)}
+.lb ol{margin:4px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));column-gap:22px}
+.lb li{display:flex;justify-content:space-between;gap:10px;padding:2px 0;border-bottom:1px dashed #22305299;font-size:15px}
+.lb li b{color:var(--accent2)}
+.lb .empty{color:var(--muted);font-style:italic;border:0}
+@media (max-height:480px){.lb li:nth-child(n+4){display:none}}
+@media (max-width:700px) and (max-height:780px){.lb li:nth-child(n+4){display:none}}
+@media (min-width:700px){.lbtab .n{display:inline}.lbtab{font-size:clamp(13px,1.3vw,16px)}}
+@media (max-height:720px),(max-width:700px){
+  .hhead{flex-direction:row;align-items:center;gap:12px;flex-wrap:wrap}
+  .hhead{margin-bottom:8px}
+  .hhead h1{font-size:clamp(20px,5.2vw,30px);margin:0}
+  .sub{display:none}
+}
 .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .pill{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:.35em 1em;font-weight:700;white-space:nowrap}
-.btn{background:var(--accent);color:#fff;font-weight:800;border-radius:16px;padding:.7em 1.6em;font-size:clamp(16px,2.6vh,26px);
+.btn{background:var(--accent);color:#fff;font-weight:800;border-radius:16px;padding:.7em 1.6em;font-size:clamp(16px,calc(2.6*var(--vh,1vh)),26px);
   box-shadow:0 6px 0 #b8470a;transition:transform .08s,box-shadow .08s}
 .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b8470a}
 .btn.ghost{background:var(--panel2);box-shadow:0 6px 0 #0d1528;color:var(--text)}
@@ -53,26 +81,26 @@ h1 span{color:var(--accent)}
 /* quiz */
 .qbar{height:12px;background:var(--panel);border-radius:99px;overflow:hidden;margin:10px 0}
 .qbar>div{height:100%;width:100%;background:var(--accent2);transition:width .1s linear,background .3s}
-.qtext{font-size:clamp(22px,4.6vh,46px);font-weight:800;line-height:1.2;margin:clamp(8px,2vh,24px) 0}
+.qtext{font-size:clamp(22px,calc(4.6*var(--vh,1vh)),46px);font-weight:800;line-height:1.2;margin:clamp(8px,calc(2*var(--vh,1vh)),24px) 0}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,1.6vw,18px)}
-.opt{background:var(--panel2);border:2px solid var(--line);border-radius:18px;padding:clamp(12px,2.6vh,28px);
-  text-align:left;font-size:clamp(16px,2.8vh,28px);font-weight:600;display:flex;gap:12px;align-items:center;transition:transform .1s}
+.opt{background:var(--panel2);border:2px solid var(--line);border-radius:18px;padding:clamp(12px,calc(2.6*var(--vh,1vh)),28px);
+  text-align:left;font-size:clamp(16px,calc(2.8*var(--vh,1vh)),28px);font-weight:600;display:flex;gap:12px;align-items:center;transition:transform .1s}
 .opt:hover{border-color:var(--accent)}
 .opt kbd{background:var(--panel);border-radius:8px;padding:.1em .55em;color:var(--accent);font-weight:800;font-family:inherit}
 .opt.right{background:#0f6b53;border-color:var(--accent2)}
 .opt.wrong{background:#6b1f2a;border-color:var(--bad)}
 .opt.dim{opacity:.45}
 .opt:disabled{cursor:default}
-.explain{min-height:3.2em;margin-top:clamp(8px,1.6vh,18px);color:var(--muted);font-size:clamp(14px,2.3vh,22px)}
+.explain{min-height:3.2em;margin-top:clamp(8px,calc(1.6*var(--vh,1vh)),18px);color:var(--muted);font-size:clamp(14px,calc(2.3*var(--vh,1vh)),22px)}
 .explain b{color:var(--text)}
 
 /* rider */
 #rider{padding:8px 10px}
 .hud{display:flex;align-items:center;gap:12px}
-.hud .score{font-size:clamp(20px,4vh,40px);font-weight:900;color:var(--accent2);min-width:3.4em}
+.hud .score{font-size:clamp(20px,calc(4*var(--vh,1vh)),40px);font-weight:900;color:var(--accent2);min-width:3.4em}
 .hud .score small{font-size:.45em;color:var(--muted);font-weight:700;display:block;margin-top:-4px}
-.hud .obj{flex:1;text-align:center;font-weight:800;font-size:clamp(14px,2.6vh,26px)}
-.hud .time{font-size:clamp(20px,4vh,40px);font-weight:900;min-width:2.4em;text-align:right}
+.hud .obj{flex:1;text-align:center;font-weight:800;font-size:clamp(14px,calc(2.6*var(--vh,1vh)),26px)}
+.hud .time{font-size:clamp(20px,calc(4*var(--vh,1vh)),40px);font-weight:900;min-width:2.4em;text-align:right}
 .tbar{height:10px;background:var(--panel);border-radius:99px;overflow:hidden;margin:6px 0}
 .tbar>div{height:100%;background:var(--accent2);width:100%}
 .stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
@@ -80,57 +108,57 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
 .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:#0b1220cc;backdrop-filter:blur(6px);border-radius:14px;text-align:center;padding:20px;z-index:3}
 .overlay.hide{display:none}
-.overlay .big{font-size:clamp(70px,22vh,220px);font-weight:900;color:var(--accent)}
-.overlay h2{font-size:clamp(24px,5vh,50px);margin:.2em 0}
-.overlay p{color:var(--muted);font-size:clamp(14px,2.4vh,24px);max-width:640px;margin:.3em 0}
+.overlay .big{font-size:clamp(70px,calc(22*var(--vh,1vh)),220px);font-weight:900;color:var(--accent)}
+.overlay h2{font-size:clamp(24px,calc(5*var(--vh,1vh)),50px);margin:.2em 0}
+.overlay p{color:var(--muted);font-size:clamp(14px,calc(2.4*var(--vh,1vh)),24px);max-width:640px;margin:.3em 0}
 .dpad{display:none;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:6px;width:min(300px,60vw);
-  margin:6px auto 0;height:min(130px,18vh)}
+  margin:6px auto 0;height:min(130px,calc(18*var(--vh,1vh)))}
 .dpad button{background:var(--panel2);border:2px solid var(--line);border-radius:14px;font-size:26px}
 .dpad button:active{background:var(--accent)}
 .dpad .u{grid-column:2;grid-row:1}.dpad .l{grid-column:1;grid-row:2}.dpad .d{grid-column:2;grid-row:2}.dpad .r{grid-column:3;grid-row:2}
 @media (pointer:coarse){.dpad{display:grid}}
 
 /* end */
-.end .big{font-size:clamp(70px,20vh,200px);font-weight:900;color:var(--accent2);line-height:1}
-.end .lbl{color:var(--muted);font-size:clamp(16px,2.8vh,28px);margin-bottom:8px}
-.prize{margin:clamp(8px,2vh,22px) auto;background:linear-gradient(90deg,#ffc83d33,#ff6a1a33);border:2px solid var(--gold);
-  border-radius:18px;padding:12px 20px;font-size:clamp(16px,3vh,30px);font-weight:800;max-width:700px}
+.end .big{font-size:clamp(70px,calc(20*var(--vh,1vh)),200px);font-weight:900;color:var(--accent2);line-height:1}
+.end .lbl{color:var(--muted);font-size:clamp(16px,calc(2.8*var(--vh,1vh)),28px);margin-bottom:8px}
+.prize{margin:clamp(8px,calc(2*var(--vh,1vh)),22px) auto;background:linear-gradient(90deg,#ffc83d33,#ff6a1a33);border:2px solid var(--gold);
+  border-radius:18px;padding:12px 20px;font-size:clamp(16px,calc(3*var(--vh,1vh)),30px);font-weight:800;max-width:700px}
 .prize.none{background:var(--panel);border-color:var(--line);color:var(--muted);font-weight:600}
 .namerow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:10px 0}
 .namerow input{background:var(--panel);border:2px solid var(--line);border-radius:14px;color:var(--text);
-  font:inherit;font-size:clamp(16px,2.6vh,26px);padding:.6em 1em;width:min(320px,80vw);text-align:center;user-select:text}
+  font:inherit;font-size:clamp(16px,calc(2.6*var(--vh,1vh)),26px);padding:.6em 1em;width:min(320px,80vw);text-align:center;user-select:text}
 .namerow input:focus{outline:0;border-color:var(--accent)}
-.rank{color:var(--gold);font-weight:800;min-height:1.4em;font-size:clamp(15px,2.4vh,24px)}
+.rank{color:var(--gold);font-weight:800;min-height:1.4em;font-size:clamp(15px,calc(2.4*var(--vh,1vh)),24px)}
 .actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:12px}
 .mute{position:fixed;right:10px;bottom:8px;z-index:5;background:var(--panel);border:1px solid var(--line);
   border-radius:99px;padding:.3em .8em;font-size:14px;opacity:.7}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 @keyframes hit{0%,100%{background:var(--panel)}30%{background:var(--bad)}}
 .pill.hit{animation:hit .6s}
-.hint{color:var(--muted);font-weight:700;min-height:1.5em;font-size:clamp(13px,2.2vh,20px);margin-bottom:6px}
+.hint{color:var(--muted);font-weight:700;min-height:1.5em;font-size:clamp(13px,calc(2.2*var(--vh,1vh)),20px);margin-bottom:6px}
 .hint b{color:var(--gold)}
 .wrap{position:relative}
 
 /* word match */
 .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,2vw,28px)}
-.mcol{display:flex;flex-direction:column;gap:clamp(6px,1.2vh,12px)}
-.tile{background:var(--panel2);border:2px solid var(--line);border-radius:16px;padding:clamp(6px,1.4vh,14px) 14px;
-  min-height:clamp(46px,8vh,76px);display:flex;align-items:center;justify-content:center;text-align:center;
+.mcol{display:flex;flex-direction:column;gap:clamp(6px,calc(1.2*var(--vh,1vh)),12px)}
+.tile{background:var(--panel2);border:2px solid var(--line);border-radius:16px;padding:clamp(6px,calc(1.4*var(--vh,1vh)),14px) 14px;
+  min-height:clamp(46px,calc(8*var(--vh,1vh)),76px);display:flex;align-items:center;justify-content:center;text-align:center;
   transition:transform .1s,border-color .1s,background .2s,opacity .3s}
-.tile.term{color:var(--accent);font-weight:800;font-size:clamp(15px,2.8vh,26px)}
-.tile.def{color:#dbe5ff;font-weight:600;font-size:clamp(12px,2.1vh,20px);line-height:1.2}
+.tile.term{color:var(--accent);font-weight:800;font-size:clamp(15px,calc(2.8*var(--vh,1vh)),26px)}
+.tile.def{color:#dbe5ff;font-weight:600;font-size:clamp(12px,calc(2.1*var(--vh,1vh)),20px);line-height:1.2}
 .tile:hover{border-color:var(--accent)}
 .tile.sel{border-color:var(--gold);background:#3a3520;transform:scale(1.03)}
 .tile.ok{background:#0f6b53;border-color:var(--accent2);opacity:.5;pointer-events:none}
 .tile.no{background:#6b1f2a;border-color:var(--bad);animation:shake .35s}
 
 /* pack it */
-.lane{position:relative;height:clamp(66px,11vh,104px);background:#3b4560;border:2px solid var(--line);
-  border-radius:16px;overflow:hidden;margin:8px 0 clamp(8px,1.6vh,16px)}
+.lane{position:relative;height:clamp(66px,calc(11*var(--vh,1vh)),104px);background:#3b4560;border:2px solid var(--line);
+  border-radius:16px;overflow:hidden;margin:8px 0 clamp(8px,calc(1.6*var(--vh,1vh)),16px)}
 .lane::before{content:"";position:absolute;left:0;right:0;top:64%;border-top:3px dashed #ffffff38}
 .lane-lbl{position:absolute;top:5px;left:12px;font-size:11px;font-weight:800;letter-spacing:.12em;color:#ffffff66}
 .lane-lbl.r{left:auto;right:12px}
-.bike{position:absolute;left:6%;bottom:4px;font-size:clamp(34px,6.4vh,58px);line-height:1}
+.bike{position:absolute;left:6%;bottom:4px;font-size:clamp(34px,calc(6.4*var(--vh,1vh)),58px);line-height:1}
 .bike .ride{display:inline-block;transform:scaleX(-1)}
 .bike .cargo{position:absolute;left:-.1em;top:-.32em;font-size:.58em}
 .bike.in{animation:bikeIn .55s .25s ease-out backwards}
@@ -140,82 +168,121 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
 @keyframes bikeOut{from{left:6%}to{left:108%}}
 .stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-5deg);border:3px solid var(--bad);
   color:var(--bad);background:#0b1220dd;font-weight:900;letter-spacing:.08em;padding:.1em .7em;border-radius:8px;
-  font-size:clamp(14px,2.8vh,26px);white-space:nowrap;animation:stamp .25s ease-out}
+  font-size:clamp(14px,calc(2.8*var(--vh,1vh)),26px);white-space:nowrap;animation:stamp .25s ease-out}
 .stamp.ok{border-color:var(--accent2);color:var(--accent2)}
 @keyframes stamp{from{transform:translate(-50%,-50%) rotate(-5deg) scale(1.8);opacity:0}}
 .req{display:flex;gap:clamp(12px,2vw,24px);align-items:center;text-align:left;
   background:linear-gradient(160deg,var(--panel2),var(--panel));border:2px solid var(--line);border-radius:20px;
-  padding:clamp(10px,2vh,22px) clamp(12px,2vw,26px);min-height:clamp(120px,22vh,190px)}
+  padding:clamp(10px,calc(2*var(--vh,1vh)),22px) clamp(12px,2vw,26px);min-height:clamp(120px,calc(22*var(--vh,1vh)),190px)}
 .req.pop{animation:reqIn .35s ease-out}
 .req.bad{animation:shake .4s;border-color:var(--bad)}
-@keyframes reqIn{from{transform:translateX(40px);opacity:0}}
-.req-emoji{font-size:clamp(52px,12vh,110px);line-height:1}
+@keyframes reqIn{from{transform:scale(.95);opacity:0}}
+.req-emoji{font-size:clamp(52px,calc(12*var(--vh,1vh)),110px);line-height:1}
 .req-body{min-width:0}
-.req-tag{color:var(--accent);font-weight:800;font-size:clamp(11px,1.7vh,14px);letter-spacing:.12em}
-.req-name{font-size:clamp(20px,3.8vh,36px);font-weight:800;line-height:1.1}
-.req-desc{color:var(--muted);font-size:clamp(13px,2.2vh,20px);margin:4px 0 8px}
+.req-tag{color:var(--accent);font-weight:800;font-size:clamp(11px,calc(1.7*var(--vh,1vh)),14px);letter-spacing:.12em}
+.req-name{font-size:clamp(20px,calc(3.8*var(--vh,1vh)),36px);font-weight:800;line-height:1.1}
+.req-desc{color:var(--muted);font-size:clamp(13px,calc(2.2*var(--vh,1vh)),20px);margin:4px 0 8px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:.2em .8em;font-weight:700;font-size:clamp(12px,2vh,18px)}
+.chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:.2em .8em;font-weight:700;font-size:clamp(12px,calc(2*var(--vh,1vh)),18px)}
 .chip.frag{border-color:var(--bad);color:#ff9aa5}
 .chip.cold{border-color:#5ab8ff;color:#9ad4ff}
 .chip.hot{border-color:var(--accent);color:#ffb27f}
-.packs{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,1.4vw,16px);margin-top:clamp(8px,1.6vh,16px)}
+.packs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,1.4vw,16px);margin-top:clamp(8px,calc(1.6*var(--vh,1vh)),16px)}
 .packs.locked .pk{pointer-events:none}
-.pk{background:var(--panel2);border:2px solid var(--line);border-radius:16px;padding:clamp(8px,1.5vh,16px);
+.pk{min-width:0;background:var(--panel2);border:2px solid var(--line);border-radius:16px;padding:clamp(8px,calc(1.5*var(--vh,1vh)),16px);
   text-align:left;display:flex;gap:10px;align-items:center;transition:transform .1s}
 .pk:hover{border-color:var(--accent)}
-.pk .pe{font-size:clamp(28px,5vh,46px);line-height:1}
-.pk b{display:block;font-size:clamp(14px,2.4vh,22px)}
-.pk small{display:block;color:var(--muted);font-size:clamp(11px,1.8vh,15px);line-height:1.25;margin-top:2px}
+.pk .pe{font-size:clamp(28px,calc(5*var(--vh,1vh)),46px);line-height:1;flex:none}
+.pk b{display:block;font-size:clamp(14px,calc(2.4*var(--vh,1vh)),22px)}
+.pk small{display:block;color:var(--muted);font-size:clamp(11px,calc(1.8*var(--vh,1vh)),15px);line-height:1.25;margin-top:2px}
 .pk kbd{background:var(--panel);border-radius:6px;padding:0 .4em;margin-right:.35em;color:var(--accent);font-family:inherit}
 .pk.right{background:#0f6b53;border-color:var(--accent2)}
 .pk.wrong{background:#6b1f2a;border-color:var(--bad)}
 
-@media (max-width:1000px){.boards{grid-template-columns:1fr 1fr}}
-@media (max-width:700px){.modes,.boards,.opts{grid-template-columns:1fr}.packs{grid-template-columns:1fr 1fr}
-  .req{flex-direction:column;text-align:center}.chips{justify-content:center}}
+/* route planner */
+#rcv{cursor:pointer}
+.rtfoot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:8px}
+.rtfoot .explain{flex:1;min-width:240px;margin:0;min-height:2.6em}
+.rtfoot .btn{font-size:clamp(14px,calc(2.2*var(--vh,1vh)),20px);padding:.45em 1.2em}
+.rtfoot .btn[hidden]{display:none}
+
+.install{right:auto;left:10px;opacity:1;font-weight:700;color:var(--text);border-color:var(--accent)}
+.install[hidden]{display:none}
+@media (max-width:700px){.opts{grid-template-columns:1fr}.modes{grid-template-columns:1fr}.mode,.mode:nth-child(n+4){grid-column:auto}.packs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pk b{font-size:clamp(12px,3.7vw,18px)}.pk small{font-size:clamp(10px,2.8vw,13px)}.pk .pe{font-size:clamp(22px,7vw,34px)}
+  .req{min-height:0}.req-emoji{font-size:clamp(40px,calc(8*var(--vh,1vh)),70px)}
+  .lane{height:clamp(50px,calc(8*var(--vh,1vh)),70px)}
+  .explain{font-size:13px;min-height:2.6em;margin-top:6px}.pk{padding:8px 10px}.req-desc{font-size:13px}.req-name{font-size:19px}.chip{font-size:13px;padding:.1em .6em}}
+
+/* ===== fit to screen: no page scrolling on phones, tablets or desktops ===== */
+.center.fit{margin:0 auto;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+#match .center,#pack .center{max-width:1000px}
+#match .wrap{flex:1;min-height:0}
+#match .mgrid{height:100%}
+.mcol{min-height:0;justify-content:center}
+.tile{flex:1 1 0;min-height:0;max-height:84px}
+.tile.term{overflow-wrap:anywhere}
+.tile.def{overflow-wrap:anywhere}
+@media (max-width:520px){
+  .topbar{gap:6px}.topbar .brand span{display:none}
+  .pill{padding:.3em .7em;font-size:13px}
+}
+@media (max-height:700px){
+  .tile.term{font-size:15px}.tile.def{font-size:12.5px}
+  .hint{font-size:13px;min-height:1.2em;margin-bottom:2px}
+  .lane{height:56px;margin:4px 0 6px}.bike{font-size:36px}
+  .req{min-height:0;padding:8px 12px;gap:10px}.req-emoji{font-size:44px}.req-name{font-size:18px}
+  .req-desc{font-size:12px;margin:2px 0 5px}.chip{font-size:11.5px;padding:.1em .6em}
+  .packs{gap:6px;margin-top:6px}.pk{padding:6px 8px;gap:8px}.pk .pe{font-size:26px}.pk b{font-size:13px}.pk small{font-size:10.5px}
+  .explain{min-height:2.4em;font-size:12.5px;margin-top:4px}
+}
+@media (max-height:480px){
+  .screen{padding:8px 14px}
+  .topbar .brand span{display:none}
+  .pill{padding:.2em .7em;font-size:13px}
+  .qbar{margin:6px 0 4px;height:8px}
+  .qtext{font-size:18px;margin:4px 0}
+  .opts{gap:6px}.opt{padding:7px 12px;font-size:14px;border-radius:12px}.opt kbd{padding:0 .4em}
+  .explain{min-height:2.2em;margin-top:4px;font-size:12px}
+  .tile{border-radius:10px;padding:2px 8px;border-width:1px}.tile.term{font-size:14px}.tile.def{font-size:12px}
+  .mcol{gap:4px}.hint{font-size:12px;min-height:1.1em;margin:0 0 2px}
+  #rider .dpad{position:absolute;right:14px;bottom:14px;width:min(170px,28vw);height:86px;margin:0;opacity:.8;z-index:2}
+  .hud .score,.hud .time{font-size:20px}.hud .obj{font-size:14px}
+  /* pack: two columns, order on the left, packaging on the right */
+  #pack .wrap{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr auto;column-gap:10px;align-content:center}
+  #pLane{grid-area:1/1}#pReq{grid-area:2/1}#pExplain{grid-area:3/1}#pOpts{grid-area:1/2/4/3;margin:0;align-content:stretch}
+  .packs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lane{height:46px;margin:0 0 6px}.bike{font-size:30px}
+  .req{flex-direction:row;text-align:left}.req-emoji{font-size:38px}
+  .rtfoot{padding-top:4px}.rtfoot .explain{min-height:1.5em}
+}
 </style>
 </head>
 <body>
 
 <!-- HOME -->
 <section id="home" class="screen active">
-  <div class="brand"><i>R</i><span id="brandName">ROUTAG</span></div>
-  <h1>Delivery <span>Challenge</span></h1>
+  <div class="hhead">
+    <div class="brand"><i>R</i><span id="brandName">ROUTAG</span></div>
+    <h1>Delivery <span>Challenge</span></h1>
+  </div>
   <p class="sub">Test your logistics brain, then race the clock as a delivery rider. Top players win merch!</p>
   <div class="modes">
-    <button class="mode" id="playQuiz">
-      <div class="ico">🧠</div>
-      <h2>Logistics Quiz</h2>
-      <p>10 quick questions on delivery &amp; logistics. Faster answers score more.</p>
-      <span class="go">Play quiz ▶</span>
-    </button>
-    <button class="mode" id="playRider">
-      <div class="ico">🛵</div>
-      <h2>Rider Rush</h2>
-      <p>60 seconds. Pick up parcels, dodge traffic, deliver as many as you can.</p>
-      <span class="go">Start riding ▶</span>
-    </button>
-    <button class="mode" id="playMatch">
-      <div class="ico">🧩</div>
-      <h2>Word Match</h2>
-      <p>Match logistics words to their meanings. Beat the clock, build a combo.</p>
-      <span class="go">Start matching ▶</span>
-    </button>
-    <button class="mode" id="playPack">
-      <div class="ico">📦</div>
-      <h2>Pack It!</h2>
-      <p>Choose the right packaging for every order, then watch the bike ride out.</p>
-      <span class="go">Start packing ▶</span>
-    </button>
+    <button class="mode" id="playQuiz"><div class="ico">🧠</div><div class="txt"><h2>Logistics Quiz</h2>
+      <p>10 quick questions on delivery &amp; logistics. Faster answers score more.</p><span class="go">Play quiz ▶</span></div></button>
+    <button class="mode" id="playRider"><div class="ico">🛵</div><div class="txt"><h2>Rider Rush</h2>
+      <p>60 seconds. Pick up parcels, dodge traffic, deliver as many as you can.</p><span class="go">Start riding ▶</span></div></button>
+    <button class="mode" id="playMatch"><div class="ico">🧩</div><div class="txt"><h2>Word Match</h2>
+      <p>Match logistics words to their meanings. Beat the clock, build a combo.</p><span class="go">Start matching ▶</span></div></button>
+    <button class="mode" id="playPack"><div class="ico">📦</div><div class="txt"><h2>Pack It!</h2>
+      <p>Choose the right packaging for every order, then watch the bike ride out.</p><span class="go">Start packing ▶</span></div></button>
+    <button class="mode" id="playRoute"><div class="ico">🗺️</div><div class="txt"><h2>Route Planner</h2>
+      <p>Plan the shortest route through every stop, then compare with the best.</p><span class="go">Plan routes ▶</span></div></button>
   </div>
-  <div class="boards">
-    <div class="board"><h3>🏆 Rider Rush</h3><ol id="lbRider"></ol></div>
-    <div class="board"><h3>🏆 Quiz</h3><ol id="lbQuiz"></ol></div>
-    <div class="board"><h3>🏆 Word Match</h3><ol id="lbMatch"></ol></div>
-    <div class="board"><h3>🏆 Pack It</h3><ol id="lbPack"></ol></div>
+  <div class="lb">
+    <div class="lbtabs" id="lbTabs"></div>
+    <div id="lbBody"></div>
   </div>
-  <div class="prizes" id="prizeLine"></div>
 </section>
 
 <!-- QUIZ -->
@@ -225,7 +292,7 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
     <div class="pill" id="qCount">Q 1/10</div>
     <div class="pill" id="qScore">0 pts</div>
   </div>
-  <div class="center">
+  <div class="center fit">
     <div class="qbar"><div id="qTimer"></div></div>
     <div class="qtext" id="qText"></div>
     <div class="opts" id="qOpts"></div>
@@ -264,7 +331,7 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
     <div class="pill" id="mScore">0 pts</div>
     <div class="pill" id="mTime">75s</div>
   </div>
-  <div class="center">
+  <div class="center fit">
     <div class="qbar"><div id="mBar"></div></div>
     <div class="hint" id="mHint"></div>
     <div class="wrap">
@@ -282,7 +349,7 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
     <div class="pill" id="pScore">0 pts</div>
     <div class="pill" id="pTime">90s</div>
   </div>
-  <div class="center">
+  <div class="center fit">
     <div class="qbar"><div id="pBar"></div></div>
     <div class="wrap">
       <div class="lane" id="pLane"><span class="lane-lbl">DISPATCH YARD</span><span class="lane-lbl r">CUSTOMERS 🏠</span></div>
@@ -290,6 +357,28 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
       <div class="packs" id="pOpts"></div>
       <div class="explain" id="pExplain"></div>
       <div class="overlay" id="pOverlay"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ROUTE PLANNER -->
+<section id="route" class="screen">
+  <div class="topbar">
+    <div class="brand"><i>R</i><span class="bn">ROUTAG</span></div>
+    <div class="pill" id="rtRound">Route 1/5</div>
+    <div class="pill" id="rtScore">0 pts</div>
+    <div class="pill" id="rtTime">25s</div>
+  </div>
+  <div class="tbar"><div id="rtBar"></div></div>
+  <div class="stage">
+    <canvas id="rcv"></canvas>
+    <div class="overlay" id="rtOverlay"></div>
+  </div>
+  <div class="rtfoot">
+    <div class="explain" id="rtInfo"></div>
+    <div class="actions" style="margin:0">
+      <button class="btn ghost" id="rtUndo">↩ Undo</button>
+      <button class="btn" id="rtNext" hidden>Next ▶</button>
     </div>
   </div>
 </section>
@@ -314,9 +403,14 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
   </div>
 </section>
 
+<button class="mute install" id="install" hidden>📲 Install app</button>
 <button class="mute" id="mute" title="Toggle sound">🔊</button>
 
 <script>
+// --vh = 1% of the *visible* height (plain vh ignores mobile address bars and overflows the screen)
+const setVh = () => document.documentElement.style.setProperty('--vh', (window.innerHeight / 100) + 'px');
+setVh(); addEventListener('resize', setVh); addEventListener('orientationchange', () => setTimeout(setVh, 200));
+
 /* ============ CONFIG: edit freely ============ */
 const CONFIG = {
   brand: 'ROUTAG',
@@ -345,6 +439,12 @@ const CONFIG = {
     { min: 9, prize: '🎁 Premium merch pack' },
     { min: 6, prize: '👕 Branded tee or cap' },
     { min: 4, prize: '🎟️ Sticker & keyring' },
+  ],
+  routeStops: [4, 5, 6, 7, 8], routeSeconds: 25,          // Route Planner: stops per round (one entry per round), seconds per round
+  routeTiers: [   // by total points (max 750: up to 150 per round)
+    { min: 560, prize: '🎁 Premium merch pack' },
+    { min: 470, prize: '👕 Branded tee or cap' },
+    { min: 380, prize: '🎟️ Sticker & keyring' },
   ],
   idleSeconds: 45,   // end screen returns home after this long
 };
@@ -434,8 +534,7 @@ function show(id) {
 function tierFor(tiers, v) { return tiers.find(t => v >= t.min); }
 
 /* ============ LEADERBOARD ============ */
-const LB_KEYS = { rider: 'routag_lb_rider', quiz: 'routag_lb_quiz', match: 'routag_lb_match', pack: 'routag_lb_pack' };
-const LB_EL = { rider: 'lbRider', quiz: 'lbQuiz', match: 'lbMatch', pack: 'lbPack' };
+const LB_KEYS = { rider: 'routag_lb_rider', quiz: 'routag_lb_quiz', match: 'routag_lb_match', pack: 'routag_lb_pack', route: 'routag_lb_route' };
 function addScore(kind, name, score) {
   const lb = store.get(LB_KEYS[kind], []);
   const entry = { name: name || 'Guest', score, ts: Date.now() };
@@ -445,19 +544,31 @@ function addScore(kind, name, score) {
   return lb.indexOf(entry) + 1;
 }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// One tabbed leaderboard keeps the home screen compact on every device; tabs rotate on their own until tapped.
+const LB_META = {
+  rider: { e: '🛵', n: 'Rider Rush', unit: 'deliveries', tiers: () => CONFIG.riderTiers },
+  quiz: { e: '🧠', n: 'Quiz', unit: 'correct', tiers: () => CONFIG.quizTiers },
+  match: { e: '🧩', n: 'Word Match', unit: 'pairs', tiers: () => CONFIG.matchTiers },
+  pack: { e: '📦', n: 'Pack It', unit: 'parcels', tiers: () => CONFIG.packTiers },
+  route: { e: '🗺️', n: 'Route Planner', unit: 'points', tiers: () => CONFIG.routeTiers },
+};
+let lbTab = 'rider', lbAuto = true;
 function renderBoards() {
-  for (const [kind, el] of Object.entries(LB_EL)) {
-    const lb = store.get(LB_KEYS[kind], []).slice(0, 5);
-    $(el).innerHTML = lb.length
+  const m = LB_META[lbTab], t = m.tiers();
+  $('lbTabs').innerHTML = Object.entries(LB_META).map(([k, v]) =>
+    `<button class="lbtab${k === lbTab ? ' on' : ''}" data-k="${k}" title="${v.n}">${v.e}<span class="n"> ${v.n}</span></button>`).join('');
+  $('lbTabs').querySelectorAll('.lbtab').forEach(b => b.onclick = () => { lbTab = b.dataset.k; lbAuto = false; renderBoards(); });
+  const lb = store.get(LB_KEYS[lbTab], []).slice(0, 5);
+  $('lbBody').innerHTML = `<div class="lbhead">🏆 ${m.n}<span>🎁 Merch at <b>${t[t.length - 1].min}+</b> ${m.unit} · top prize <b>${t[0].min}+</b></span></div><ol>`
+    + (lb.length
       ? lb.map((e, i) => `<li><span>${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'} ${esc(e.name)}</span><b>${e.score}</b></li>`).join('')
-      : '<li class="empty">No scores yet. Be the first!</li>';
-  }
-  const low = t => t[t.length - 1].min, top = t => t[0].min, C = CONFIG;
-  $('prizeLine').innerHTML = `Merch unlocks at: Rider Rush <b>${low(C.riderTiers)}+</b> · Quiz <b>${low(C.quizTiers)}+</b> · `
-    + `Word Match <b>${low(C.matchTiers)}+</b> · Pack It <b>${low(C.packTiers)}+</b>. `
-    + `Top prize at <b>${top(C.riderTiers)} / ${top(C.quizTiers)} / ${top(C.matchTiers)} / ${top(C.packTiers)}</b>.`;
+      : '<li class="empty">No scores yet. Be the first!</li>') + '</ol>';
 }
-function goHome() { stopRider(); stopMatch(); stopPack(); clearInterval(qInt); show('home'); renderBoards(); }
+setInterval(() => {
+  if (!lbAuto || !$('home').classList.contains('active')) return;
+  const keys = Object.keys(LB_META); lbTab = keys[(keys.indexOf(lbTab) + 1) % keys.length]; renderBoards();
+}, 6000);
+function goHome() { stopRider(); stopMatch(); stopPack(); stopRoute(); clearInterval(qInt); show('home'); renderBoards(); }
 
 /* ============ END SCREEN ============ */
 let endCtx = null;
@@ -486,7 +597,7 @@ function saveEnd() {
 $('eSave').onclick = saveEnd;
 $('eName').addEventListener('keydown', e => { if (e.key === 'Enter') saveEnd(); });
 $('eHome').onclick = goHome;
-$('eAgain').onclick = () => endCtx && ({ quiz: startQuiz, rider: startRider, match: startMatch, pack: startPack })[endCtx.kind]();
+$('eAgain').onclick = () => endCtx && ({ quiz: startQuiz, rider: startRider, match: startMatch, pack: startPack, route: startRoute })[endCtx.kind]();
 
 /* ============ QUIZ ============ */
 let qSet = [], qi = 0, qCorrect = 0, qPoints = 0, qLeft = 0, qInt, qLocked = false;
@@ -1088,12 +1199,203 @@ document.addEventListener('keydown', e => {
   if ($('pack').classList.contains('active') && /^[1-6]$/.test(e.key)) choosePack(+e.key - 1);
 });
 
+/* ============ ROUTE PLANNER ============ */
+const RW = 800, RH = 500, KM = 0.02;   // map size in px, km per px
+const rcv = $('rcv'), rg = rcv.getContext('2d');
+rcv.width = RW; rcv.height = RH;
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+const polyLen = pts => pts.reduce((s, p, i) => i ? s + dist(pts[i - 1], p) : 0, 0);
+
+let RT = null, rtPhase = 'idle', rtGame = 0, rtInt, rtRaf = 0;
+function stopRoute() { rtPhase = 'idle'; rtGame++; clearInterval(rtInt); cancelAnimationFrame(rtRaf); }
+
+function genPoints(n) {   // depot + n stops, well spaced
+  for (let tries = 0; tries < 200; tries++) {
+    const pts = [];
+    for (let k = 0; k < 500 && pts.length < n + 1; k++) {
+      const p = { x: 50 + rnd(RW - 100), y: 50 + rnd(RH - 100) };
+      if (pts.every(q => dist(p, q) > 105)) pts.push(p);
+    }
+    if (pts.length === n + 1) return pts;
+  }
+  return Array.from({ length: n + 1 }, (_, i) => ({ x: 70 + (i % 5) * 150, y: 100 + Math.floor(i / 5) * 250 }));
+}
+function bestRoute(depot, stops) {   // exact search with pruning: fine for up to 8 stops
+  let best = { len: Infinity, order: [] };
+  const used = new Array(stops.length).fill(false), cur = [];
+  (function go(last, len) {
+    if (len >= best.len) return;
+    if (cur.length === stops.length) {
+      const total = len + dist(last, depot);
+      if (total < best.len) best = { len: total, order: cur.slice() };
+      return;
+    }
+    for (let i = 0; i < stops.length; i++) if (!used[i]) {
+      used[i] = true; cur.push(i); go(stops[i], len + dist(last, stops[i])); cur.pop(); used[i] = false;
+    }
+  })(depot, 0);
+  return best;
+}
+const rtPath = order => [RT.depot, ...order.map(i => RT.stops[i]), RT.depot];
+
+function startRoute() {
+  stopRoute();
+  RT = { round: 0, pts: 0, effs: [], order: [], stops: [], depot: null, left: 0, best: null, showBest: false, bike: null, done: false };
+  rtPhase = 'ready'; show('route'); updRtHud();
+  $('rtInfo').textContent = ''; $('rtNext').hidden = true; $('rtUndo').hidden = false;
+  RT.depot = { x: RW / 2, y: RH / 2 }; RT.stops = []; rtDraw();
+  const ov = $('rtOverlay');
+  ov.className = 'overlay';
+  ov.innerHTML = `<h2>🗺️ Route Planner</h2>
+    <p>Tap the stops <b>in the order you will visit them</b>. The rider returns to <b>🏪</b> by itself.<br>
+    Shorter routes score more, and the shortest possible earns a bonus.<br>
+    <b>${CONFIG.routeStops.length} routes</b>, <b>${CONFIG.routeSeconds}s</b> each. Tap the last stop again to undo it.</p>
+    <button class="btn" id="rtStart" style="margin-top:14px">GO!</button>`;
+  $('rtStart').onclick = () => { ov.classList.add('hide'); sfx.go(); newRoute(); };
+}
+function newRoute() {
+  const n = CONFIG.routeStops[RT.round], pts = genPoints(n);
+  RT.depot = pts[0]; RT.stops = pts.slice(1); RT.order = []; RT.showBest = false; RT.bike = null;
+  RT.best = bestRoute(RT.depot, RT.stops); RT.left = CONFIG.routeSeconds; RT.done = false;
+  rtPhase = 'play';
+  $('rtNext').hidden = true; $('rtUndo').hidden = false;
+  $('rtInfo').innerHTML = `Tap all <b>${n} stops</b> in the shortest order you can find.`;
+  clearInterval(rtInt);
+  rtInt = setInterval(() => { RT.left -= .1; updRtHud(); if (RT.left <= 0) finishRoute(true); }, 100);
+  updRtHud(); rtDraw();
+}
+function updRtHud() {
+  const left = RT ? Math.max(0, RT.left) : CONFIG.routeSeconds;
+  $('rtRound').textContent = `Route ${Math.min(RT ? RT.round + 1 : 1, CONFIG.routeStops.length)}/${CONFIG.routeStops.length}`;
+  $('rtScore').textContent = `${RT ? RT.pts : 0} pts`;
+  $('rtTime').textContent = Math.ceil(left) + 's';
+  $('rtBar').style.width = (left / CONFIG.routeSeconds * 100) + '%';
+  $('rtBar').style.background = left <= 5 ? 'var(--bad)' : 'var(--accent2)';
+}
+function rtPoint(e) {   // canvas is object-fit:contain, so map the tap through the letterboxed content box
+  const r = rcv.getBoundingClientRect(), k = Math.min(r.width / RW, r.height / RH);
+  return { x: (e.clientX - r.left - (r.width - RW * k) / 2) / k, y: (e.clientY - r.top - (r.height - RH * k) / 2) / k };
+}
+rcv.addEventListener('pointerdown', e => {
+  if (rtPhase !== 'play') return;
+  e.preventDefault();
+  const p = rtPoint(e);
+  let hit = -1, hd = 40;
+  RT.stops.forEach((s, i) => { const d = dist(p, s); if (d < hd) { hd = d; hit = i; } });
+  if (hit < 0) return;
+  const at = RT.order.indexOf(hit);
+  if (at >= 0 && at === RT.order.length - 1) { RT.order.pop(); sfx.tick(); }   // tap the last stop again = undo
+  else if (at < 0) {
+    RT.order.push(hit); sfx.pickup();
+    if (RT.order.length === RT.stops.length) { rtDraw(); return finishRoute(false); }
+  }
+  rtDraw();
+});
+$('rtUndo').onclick = () => { if (rtPhase === 'play' && RT.order.length) { RT.order.pop(); sfx.tick(); rtDraw(); } };
+
+function finishRoute(timeout) {
+  if (rtPhase !== 'play') return;
+  rtPhase = 'anim'; clearInterval(rtInt);
+  const best = RT.best.len;
+  let eff = 0, pts = 0, len = 0;
+  if (!timeout) {
+    len = polyLen(rtPath(RT.order));
+    eff = Math.min(1, best / len);
+    pts = Math.round(eff * 100) + (eff > .9999 ? 50 : 0);
+  }
+  const reveal = () => {
+    rtPhase = 'result'; RT.showBest = true; RT.bike = null; RT.pts += pts; RT.effs.push(eff);
+    const last = RT.round >= CONFIG.routeStops.length - 1, km = v => (v * KM).toFixed(1) + ' km';
+    $('rtInfo').innerHTML = timeout
+      ? `<b>⏱ Time's up.</b> The shortest route was <b>${km(best)}</b>. (+0)`
+      : pts >= 150 ? `<b>🎯 Perfect!</b> You found the shortest route, <b>${km(best)}</b>. (+${pts})`
+      : `Your route <b>${km(len)}</b> · shortest <b>${km(best)}</b> → <b>${Math.round(eff * 100)}% efficient</b> (+${pts})`;
+    $('rtNext').textContent = last ? 'See results ▶' : 'Next route ▶';
+    $('rtNext').hidden = false; $('rtUndo').hidden = true;
+    (eff >= .9 ? sfx.good : sfx.bad)();
+    updRtHud(); rtDraw();
+  };
+  if (timeout) return reveal();
+  // animate the bike along the player's route, then reveal the best one
+  const path = rtPath(RT.order), total = len, t0 = performance.now(), g = rtGame, dur = Math.min(2200, 700 + total * 2.2);
+  const frame = now => {
+    if (g !== rtGame) return;
+    const f = Math.min(1, (now - t0) / dur);
+    RT.bike = f * total; rtDraw();
+    if (f < 1) rtRaf = requestAnimationFrame(frame); else reveal();
+  };
+  rtRaf = requestAnimationFrame(frame);
+}
+$('rtNext').onclick = () => {
+  if (rtPhase !== 'result') return;
+  RT.round++;
+  if (RT.round >= CONFIG.routeStops.length) {
+    const avg = Math.round(RT.effs.reduce((a, b) => a + b, 0) / RT.effs.length * 100), pts = RT.pts;
+    rtPhase = 'done';
+    showEnd({
+      kind: 'route', title: 'All routes planned!', big: pts, label: `points · ${avg}% average efficiency`,
+      score: pts, tiers: CONFIG.routeTiers, tierValue: pts,
+    });
+  } else newRoute();
+};
+
+function rtDraw() {
+  if (!RT) return;
+  const g = rg;
+  g.clearRect(0, 0, RW, RH);
+  g.fillStyle = '#1a2740'; g.fillRect(0, 0, RW, RH);
+  g.strokeStyle = '#ffffff0f'; g.lineWidth = 1;
+  for (let x = 0; x <= RW; x += 50) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, RH); g.stroke(); }
+  for (let y = 0; y <= RH; y += 50) { g.beginPath(); g.moveTo(0, y); g.lineTo(RW, y); g.stroke(); }
+  g.strokeStyle = '#2a3a5e'; g.lineWidth = 4; g.strokeRect(0, 0, RW, RH);
+  if (!RT.stops.length) { drawPin(RT.depot, '🏪', '#ffc83d'); return; }
+  const poly = (pts, color, w, dash, upTo = Infinity) => {   // draws up to a distance along the polyline
+    g.strokeStyle = color; g.lineWidth = w; g.setLineDash(dash); g.lineJoin = g.lineCap = 'round';
+    g.beginPath(); g.moveTo(pts[0].x, pts[0].y);
+    let acc = 0, end = pts[0];
+    for (let i = 1; i < pts.length && acc < upTo; i++) {
+      const d = dist(pts[i - 1], pts[i]), k = Math.min(1, (upTo - acc) / d);
+      end = { x: pts[i - 1].x + (pts[i].x - pts[i - 1].x) * k, y: pts[i - 1].y + (pts[i].y - pts[i - 1].y) * k };
+      g.lineTo(end.x, end.y); acc += d;
+    }
+    g.stroke(); g.setLineDash([]);
+    return end;
+  };
+  if (RT.showBest) poly([RT.depot, ...RT.best.order.map(i => RT.stops[i]), RT.depot], '#19d3a2', 5, [4, 10]);
+  const complete = RT.order.length === RT.stops.length;
+  let end = null;
+  if (RT.order.length) {
+    const path = complete ? rtPath(RT.order) : [RT.depot, ...RT.order.map(i => RT.stops[i])];
+    end = poly(path, '#ff6a1a', 5, [], RT.bike == null ? Infinity : RT.bike);
+  }
+  drawPin(RT.depot, '🏪', '#ffc83d');
+  RT.stops.forEach((s, i) => {
+    const n = RT.order.indexOf(i);
+    drawPin(s, n < 0 ? '🏠' : String(n + 1), n < 0 ? '#93a3c7' : '#ff6a1a', n >= 0);
+  });
+  if (RT.bike != null && end) {
+    g.font = '34px "Segoe UI Emoji","Apple Color Emoji",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('🛵', end.x, end.y - 6);
+  }
+}
+function drawPin(p, label, color, filled) {
+  const g = rg, depot = label === '🏪';
+  g.beginPath(); g.arc(p.x, p.y, depot ? 26 : 21, 0, 7);
+  g.fillStyle = filled ? color : '#131d33'; g.fill();
+  g.lineWidth = 3; g.strokeStyle = color; g.stroke();
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  if (filled) { g.fillStyle = '#fff'; g.font = '800 20px "Segoe UI",sans-serif'; }
+  else g.font = `${depot ? 28 : 22}px "Segoe UI Emoji","Apple Color Emoji",sans-serif`;
+  g.fillText(label, p.x, p.y + 1);
+}
+
 /* ============ BOOT ============ */
 document.querySelectorAll('.bn,#brandName').forEach(el => el.textContent = CONFIG.brand);
 $('playQuiz').onclick = startQuiz;
 $('playRider').onclick = startRider;
 $('playMatch').onclick = startMatch;
 $('playPack').onclick = startPack;
+$('playRoute').onclick = startRoute;
 // booth admin: Ctrl+Shift+L clears all leaderboards, Esc returns home
 document.addEventListener('keydown', e => {
   if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'l') {
@@ -1102,6 +1404,37 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && !$('home').classList.contains('active') && document.activeElement !== $('eName')) goHome();
 });
 renderBoards();
+
+/* ============ PWA ============ */
+// Offline support (needs http/https, so it is skipped when opened as a file).
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+// Install button: Chrome/Edge/Android use the install prompt; iOS Safari needs the Share menu.
+const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+let installEvt = null;
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; $('install').hidden = false; });
+addEventListener('appinstalled', () => { installEvt = null; $('install').hidden = true; });
+if (isIOS && !standalone) $('install').hidden = false;
+$('install').onclick = async () => {
+  if (installEvt) { installEvt.prompt(); await installEvt.userChoice.catch(() => {}); installEvt = null; $('install').hidden = true; }
+  else if (isIOS) alert('To install: tap the Share button, then "Add to Home Screen".');
+};
+// Keep the screen awake while the app is open (booth / kiosk use).
+let wakeLock = null;
+async function keepAwake() {
+  try { if ('wakeLock' in navigator && !wakeLock && document.visibilityState === 'visible') {
+    wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => wakeLock = null);
+  } } catch (e) {}
+}
+document.addEventListener('pointerdown', keepAwake);
+document.addEventListener('visibilitychange', keepAwake);
+// Home-screen shortcuts open a game directly: /?play=quiz | rider | match | pack | route
+{
+  const start = { quiz: startQuiz, rider: startRider, match: startMatch, pack: startPack, route: startRoute }[new URLSearchParams(location.search).get('play')];
+  if (start) start();
+}
 </script>
 </body>
 </html>

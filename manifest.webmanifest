@@ -1,0 +1,25 @@
+{
+  "id": "./",
+  "name": "Routag Delivery Challenge",
+  "short_name": "Routag",
+  "description": "Logistics games: quiz, rider rush, word match, pack it and route planner.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "categories": ["games", "education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Logistics Quiz", "url": "./?play=quiz" },
+    { "name": "Rider Rush", "url": "./?play=rider" },
+    { "name": "Word Match", "url": "./?play=match" },
+    { "name": "Pack It!", "url": "./?play=pack" },
+    { "name": "Route Planner", "url": "./?play=route" }
+  ]
+}
