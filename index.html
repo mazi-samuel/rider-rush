@@ -26,12 +26,12 @@ h1 span{color:var(--accent)}
 .mode{background:linear-gradient(160deg,var(--panel2),var(--panel));border:2px solid var(--line);border-radius:22px;
   padding:clamp(14px,3vh,34px);text-align:left;transition:transform .12s,border-color .12s}
 .mode:hover,.mode:focus-visible{transform:translateY(-3px);border-color:var(--accent);outline:0}
-.mode .ico{font-size:clamp(36px,7vh,76px)}
+.mode .ico{font-size:clamp(32px,5.5vh,64px)}
 .mode h2{margin:.2em 0;font-size:clamp(20px,3.6vh,36px)}
 .mode p{margin:0;color:var(--muted);font-size:clamp(13px,2vh,19px)}
 .mode .go{display:inline-block;margin-top:clamp(8px,1.6vh,18px);background:var(--accent);color:#fff;font-weight:700;
   border-radius:999px;padding:.5em 1.3em;font-size:clamp(14px,2.2vh,22px)}
-.boards{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,2vw,24px);margin-top:clamp(10px,2vh,24px)}
+.boards{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,2vw,24px);margin-top:clamp(10px,2vh,24px)}
 .board{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px 16px}
 .board h3{margin:0 0 6px;font-size:clamp(14px,2.2vh,20px);color:var(--gold)}
 .board ol{margin:0;padding:0;list-style:none}
@@ -78,7 +78,7 @@ h1 span{color:var(--accent)}
 .stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
 canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius:14px}
 .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:#0b1220cc;border-radius:14px;text-align:center;padding:20px}
+  background:#0b1220cc;backdrop-filter:blur(6px);border-radius:14px;text-align:center;padding:20px;z-index:3}
 .overlay.hide{display:none}
 .overlay .big{font-size:clamp(70px,22vh,220px);font-weight:900;color:var(--accent)}
 .overlay h2{font-size:clamp(24px,5vh,50px);margin:.2em 0}
@@ -104,7 +104,76 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
 .actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:12px}
 .mute{position:fixed;right:10px;bottom:8px;z-index:5;background:var(--panel);border:1px solid var(--line);
   border-radius:99px;padding:.3em .8em;font-size:14px;opacity:.7}
-@media (max-width:700px){.modes,.boards,.opts{grid-template-columns:1fr}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@keyframes hit{0%,100%{background:var(--panel)}30%{background:var(--bad)}}
+.pill.hit{animation:hit .6s}
+.hint{color:var(--muted);font-weight:700;min-height:1.5em;font-size:clamp(13px,2.2vh,20px);margin-bottom:6px}
+.hint b{color:var(--gold)}
+.wrap{position:relative}
+
+/* word match */
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,2vw,28px)}
+.mcol{display:flex;flex-direction:column;gap:clamp(6px,1.2vh,12px)}
+.tile{background:var(--panel2);border:2px solid var(--line);border-radius:16px;padding:clamp(6px,1.4vh,14px) 14px;
+  min-height:clamp(46px,8vh,76px);display:flex;align-items:center;justify-content:center;text-align:center;
+  transition:transform .1s,border-color .1s,background .2s,opacity .3s}
+.tile.term{color:var(--accent);font-weight:800;font-size:clamp(15px,2.8vh,26px)}
+.tile.def{color:#dbe5ff;font-weight:600;font-size:clamp(12px,2.1vh,20px);line-height:1.2}
+.tile:hover{border-color:var(--accent)}
+.tile.sel{border-color:var(--gold);background:#3a3520;transform:scale(1.03)}
+.tile.ok{background:#0f6b53;border-color:var(--accent2);opacity:.5;pointer-events:none}
+.tile.no{background:#6b1f2a;border-color:var(--bad);animation:shake .35s}
+
+/* pack it */
+.lane{position:relative;height:clamp(66px,11vh,104px);background:#3b4560;border:2px solid var(--line);
+  border-radius:16px;overflow:hidden;margin:8px 0 clamp(8px,1.6vh,16px)}
+.lane::before{content:"";position:absolute;left:0;right:0;top:64%;border-top:3px dashed #ffffff38}
+.lane-lbl{position:absolute;top:5px;left:12px;font-size:11px;font-weight:800;letter-spacing:.12em;color:#ffffff66}
+.lane-lbl.r{left:auto;right:12px}
+.bike{position:absolute;left:6%;bottom:4px;font-size:clamp(34px,6.4vh,58px);line-height:1}
+.bike .ride{display:inline-block;transform:scaleX(-1)}
+.bike .cargo{position:absolute;left:-.1em;top:-.32em;font-size:.58em}
+.bike.in{animation:bikeIn .55s .25s ease-out backwards}
+.bike.nope{animation:shake .4s}
+.bike.out{animation:bikeOut 1.3s cubic-bezier(.5,0,1,1) forwards}
+@keyframes bikeIn{from{left:-14%}to{left:6%}}
+@keyframes bikeOut{from{left:6%}to{left:108%}}
+.stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-5deg);border:3px solid var(--bad);
+  color:var(--bad);background:#0b1220dd;font-weight:900;letter-spacing:.08em;padding:.1em .7em;border-radius:8px;
+  font-size:clamp(14px,2.8vh,26px);white-space:nowrap;animation:stamp .25s ease-out}
+.stamp.ok{border-color:var(--accent2);color:var(--accent2)}
+@keyframes stamp{from{transform:translate(-50%,-50%) rotate(-5deg) scale(1.8);opacity:0}}
+.req{display:flex;gap:clamp(12px,2vw,24px);align-items:center;text-align:left;
+  background:linear-gradient(160deg,var(--panel2),var(--panel));border:2px solid var(--line);border-radius:20px;
+  padding:clamp(10px,2vh,22px) clamp(12px,2vw,26px);min-height:clamp(120px,22vh,190px)}
+.req.pop{animation:reqIn .35s ease-out}
+.req.bad{animation:shake .4s;border-color:var(--bad)}
+@keyframes reqIn{from{transform:translateX(40px);opacity:0}}
+.req-emoji{font-size:clamp(52px,12vh,110px);line-height:1}
+.req-body{min-width:0}
+.req-tag{color:var(--accent);font-weight:800;font-size:clamp(11px,1.7vh,14px);letter-spacing:.12em}
+.req-name{font-size:clamp(20px,3.8vh,36px);font-weight:800;line-height:1.1}
+.req-desc{color:var(--muted);font-size:clamp(13px,2.2vh,20px);margin:4px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:.2em .8em;font-weight:700;font-size:clamp(12px,2vh,18px)}
+.chip.frag{border-color:var(--bad);color:#ff9aa5}
+.chip.cold{border-color:#5ab8ff;color:#9ad4ff}
+.chip.hot{border-color:var(--accent);color:#ffb27f}
+.packs{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,1.4vw,16px);margin-top:clamp(8px,1.6vh,16px)}
+.packs.locked .pk{pointer-events:none}
+.pk{background:var(--panel2);border:2px solid var(--line);border-radius:16px;padding:clamp(8px,1.5vh,16px);
+  text-align:left;display:flex;gap:10px;align-items:center;transition:transform .1s}
+.pk:hover{border-color:var(--accent)}
+.pk .pe{font-size:clamp(28px,5vh,46px);line-height:1}
+.pk b{display:block;font-size:clamp(14px,2.4vh,22px)}
+.pk small{display:block;color:var(--muted);font-size:clamp(11px,1.8vh,15px);line-height:1.25;margin-top:2px}
+.pk kbd{background:var(--panel);border-radius:6px;padding:0 .4em;margin-right:.35em;color:var(--accent);font-family:inherit}
+.pk.right{background:#0f6b53;border-color:var(--accent2)}
+.pk.wrong{background:#6b1f2a;border-color:var(--bad)}
+
+@media (max-width:1000px){.boards{grid-template-columns:1fr 1fr}}
+@media (max-width:700px){.modes,.boards,.opts{grid-template-columns:1fr}.packs{grid-template-columns:1fr 1fr}
+  .req{flex-direction:column;text-align:center}.chips{justify-content:center}}
 </style>
 </head>
 <body>
@@ -127,10 +196,24 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
       <p>60 seconds. Pick up parcels, dodge traffic, deliver as many as you can.</p>
       <span class="go">Start riding ▶</span>
     </button>
+    <button class="mode" id="playMatch">
+      <div class="ico">🧩</div>
+      <h2>Word Match</h2>
+      <p>Match logistics words to their meanings. Beat the clock, build a combo.</p>
+      <span class="go">Start matching ▶</span>
+    </button>
+    <button class="mode" id="playPack">
+      <div class="ico">📦</div>
+      <h2>Pack It!</h2>
+      <p>Choose the right packaging for every order, then watch the bike ride out.</p>
+      <span class="go">Start packing ▶</span>
+    </button>
   </div>
   <div class="boards">
-    <div class="board"><h3>🏆 Rider Rush: top deliveries</h3><ol id="lbRider"></ol></div>
-    <div class="board"><h3>🏆 Quiz: top scores</h3><ol id="lbQuiz"></ol></div>
+    <div class="board"><h3>🏆 Rider Rush</h3><ol id="lbRider"></ol></div>
+    <div class="board"><h3>🏆 Quiz</h3><ol id="lbQuiz"></ol></div>
+    <div class="board"><h3>🏆 Word Match</h3><ol id="lbMatch"></ol></div>
+    <div class="board"><h3>🏆 Pack It</h3><ol id="lbPack"></ol></div>
   </div>
   <div class="prizes" id="prizeLine"></div>
 </section>
@@ -173,6 +256,44 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
   </div>
 </section>
 
+<!-- WORD MATCH -->
+<section id="match" class="screen">
+  <div class="topbar">
+    <div class="brand"><i>R</i><span class="bn">ROUTAG</span></div>
+    <div class="pill" id="mCount">0 matched</div>
+    <div class="pill" id="mScore">0 pts</div>
+    <div class="pill" id="mTime">75s</div>
+  </div>
+  <div class="center">
+    <div class="qbar"><div id="mBar"></div></div>
+    <div class="hint" id="mHint"></div>
+    <div class="wrap">
+      <div class="mgrid" id="mGrid"></div>
+      <div class="overlay" id="mOverlay"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PACK IT -->
+<section id="pack" class="screen">
+  <div class="topbar">
+    <div class="brand"><i>R</i><span class="bn">ROUTAG</span></div>
+    <div class="pill" id="pCount">🛵 0 dispatched</div>
+    <div class="pill" id="pScore">0 pts</div>
+    <div class="pill" id="pTime">90s</div>
+  </div>
+  <div class="center">
+    <div class="qbar"><div id="pBar"></div></div>
+    <div class="wrap">
+      <div class="lane" id="pLane"><span class="lane-lbl">DISPATCH YARD</span><span class="lane-lbl r">CUSTOMERS 🏠</span></div>
+      <div class="req" id="pReq"></div>
+      <div class="packs" id="pOpts"></div>
+      <div class="explain" id="pExplain"></div>
+      <div class="overlay" id="pOverlay"></div>
+    </div>
+  </div>
+</section>
+
 <!-- END -->
 <section id="end" class="screen end">
   <div class="center">
@@ -212,6 +333,18 @@ const CONFIG = {
     { min: 9, prize: '🎁 Premium merch pack' },
     { min: 7, prize: '👕 Branded tee or cap' },
     { min: 5, prize: '🎟️ Sticker & keyring' },
+  ],
+  matchSeconds: 75, matchPerRound: 6, matchPenalty: 3,   // Word Match: time, pairs per board, seconds lost per wrong pair
+  matchTiers: [   // by number of pairs matched
+    { min: 22, prize: '🎁 Premium merch pack' },
+    { min: 15, prize: '👕 Branded tee or cap' },
+    { min: 9, prize: '🎟️ Sticker & keyring' },
+  ],
+  packSeconds: 90, packPenalty: 4,                        // Pack It: time, seconds lost per wrong packaging
+  packTiers: [    // by number of parcels packed correctly
+    { min: 9, prize: '🎁 Premium merch pack' },
+    { min: 6, prize: '👕 Branded tee or cap' },
+    { min: 4, prize: '🎟️ Sticker & keyring' },
   ],
   idleSeconds: 45,   // end screen returns home after this long
 };
@@ -301,7 +434,8 @@ function show(id) {
 function tierFor(tiers, v) { return tiers.find(t => v >= t.min); }
 
 /* ============ LEADERBOARD ============ */
-const LB_KEYS = { rider: 'routag_lb_rider', quiz: 'routag_lb_quiz' };
+const LB_KEYS = { rider: 'routag_lb_rider', quiz: 'routag_lb_quiz', match: 'routag_lb_match', pack: 'routag_lb_pack' };
+const LB_EL = { rider: 'lbRider', quiz: 'lbQuiz', match: 'lbMatch', pack: 'lbPack' };
 function addScore(kind, name, score) {
   const lb = store.get(LB_KEYS[kind], []);
   const entry = { name: name || 'Guest', score, ts: Date.now() };
@@ -312,17 +446,18 @@ function addScore(kind, name, score) {
 }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function renderBoards() {
-  for (const [kind, el] of [['rider', 'lbRider'], ['quiz', 'lbQuiz']]) {
+  for (const [kind, el] of Object.entries(LB_EL)) {
     const lb = store.get(LB_KEYS[kind], []).slice(0, 5);
     $(el).innerHTML = lb.length
       ? lb.map((e, i) => `<li><span>${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'} ${esc(e.name)}</span><b>${e.score}</b></li>`).join('')
       : '<li class="empty">No scores yet. Be the first!</li>';
   }
-  const r = CONFIG.riderTiers[CONFIG.riderTiers.length - 1], top = CONFIG.riderTiers[0];
-  $('prizeLine').innerHTML = `Rider Rush: <b>${r.min}+</b> deliveries wins something, <b>${top.min}+</b> wins the top prize.`
-    + ` Quiz: <b>${CONFIG.quizTiers[CONFIG.quizTiers.length - 1].min}+</b> correct wins something.`;
+  const low = t => t[t.length - 1].min, top = t => t[0].min, C = CONFIG;
+  $('prizeLine').innerHTML = `Merch unlocks at: Rider Rush <b>${low(C.riderTiers)}+</b> · Quiz <b>${low(C.quizTiers)}+</b> · `
+    + `Word Match <b>${low(C.matchTiers)}+</b> · Pack It <b>${low(C.packTiers)}+</b>. `
+    + `Top prize at <b>${top(C.riderTiers)} / ${top(C.quizTiers)} / ${top(C.matchTiers)} / ${top(C.packTiers)}</b>.`;
 }
-function goHome() { stopRider(); clearInterval(qInt); show('home'); renderBoards(); }
+function goHome() { stopRider(); stopMatch(); stopPack(); clearInterval(qInt); show('home'); renderBoards(); }
 
 /* ============ END SCREEN ============ */
 let endCtx = null;
@@ -351,7 +486,7 @@ function saveEnd() {
 $('eSave').onclick = saveEnd;
 $('eName').addEventListener('keydown', e => { if (e.key === 'Enter') saveEnd(); });
 $('eHome').onclick = goHome;
-$('eAgain').onclick = () => endCtx && (endCtx.kind === 'quiz' ? startQuiz() : startRider());
+$('eAgain').onclick = () => endCtx && ({ quiz: startQuiz, rider: startRider, match: startMatch, pack: startPack })[endCtx.kind]();
 
 /* ============ QUIZ ============ */
 let qSet = [], qi = 0, qCorrect = 0, qPoints = 0, qLeft = 0, qInt, qLocked = false;
@@ -654,14 +789,315 @@ cv.addEventListener('touchmove', e => {
 }, { passive: true });
 cv.addEventListener('touchend', () => sw = null);
 
+/* ============ WORD MATCH ============ */
+// [word, meaning]. Keep meanings short so they fit on a tile.
+const PAIRS = [
+  ['POD', 'Proof that a parcel was delivered'],
+  ['3PL', 'Outsourced logistics provider'],
+  ['SKU', 'Unique code for each product'],
+  ['ETA', 'When the parcel should arrive'],
+  ['COD', 'Customer pays on arrival'],
+  ['TMS', 'Software that plans transport'],
+  ['WMS', 'Software that runs the warehouse'],
+  ['LTL', 'Shipment sharing truck space'],
+  ['OTIF', 'Delivered on time and complete'],
+  ['Last mile', 'Final leg to the customer\'s door'],
+  ['Cross-docking', 'Truck to truck with no storage'],
+  ['Geofence', 'Virtual boundary that triggers alerts'],
+  ['Telematics', 'GPS and vehicle data for fleets'],
+  ['Dwell time', 'Time spent sitting idle'],
+  ['Milk run', 'Fixed route with several pickups'],
+  ['Hub-and-spoke', 'Central sorting point feeding branches'],
+  ['Reverse logistics', 'Handling returns'],
+  ['Bill of Lading', 'Carrier\'s receipt and contract'],
+  ['Incoterms', 'International trade delivery terms'],
+  ['Consignee', 'Person receiving the goods'],
+  ['Consignor', 'Person sending the goods'],
+  ['Payload', 'Weight a vehicle can carry'],
+  ['Dispatch', 'Assigning a rider to an order'],
+  ['Fragile', 'Breaks easily, handle with care'],
+  ['Route optimisation', 'Finding the best order of stops'],
+  ['Tracking number', 'Code to follow a parcel'],
+  ['Failed delivery', 'Rider could not hand over the parcel'],
+  ['Dropshipping', 'Supplier ships straight to the customer'],
+  ['Pallet', 'Platform for moving stacked goods'],
+  ['Fleet', 'All vehicles a company runs'],
+  ['Backorder', 'Ordered but not in stock yet'],
+  ['Courier', 'Company or person that carries parcels'],
+];
+const comboPts = s => 100 + 20 * Math.min(s - 1, 5);   // 100, 120 ... 200 for streaks
+function hitPill(id) { const el = $(id); el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); }
+
+let mPool = [], mSet = [], mSel = null, mLocked = false, mLeft = 0, mRight = 0, mPts = 0, mStreak = 0;
+let mInt, mPhase = 'idle', mGame = 0, mLastSec = -1;
+const MATCH_HINT = 'Tap a <b>word</b>, then tap its <b>meaning</b>';
+function mLater(fn, ms) { const g = mGame; setTimeout(() => { if (g === mGame && mPhase === 'play') fn(); }, ms); }
+function stopMatch() { mPhase = 'idle'; mGame++; clearInterval(mInt); }
+function startMatch() {
+  stopMatch();
+  mPool = shuffle(PAIRS); mRight = 0; mPts = 0; mStreak = 0; mLeft = CONFIG.matchSeconds; mPhase = 'ready'; mLastSec = -1;
+  show('match'); updMatchHud(); newRound();
+  $('mHint').innerHTML = MATCH_HINT;
+  const ov = $('mOverlay');
+  ov.className = 'overlay';
+  ov.innerHTML = `<h2>🧩 Word Match</h2>
+    <p>Tap a <b>word</b>, then tap its <b>meaning</b>.<br>
+    Chain correct pairs for combo points. A wrong pair costs <b>${CONFIG.matchPenalty} seconds</b>.<br>
+    You have <b>${CONFIG.matchSeconds} seconds</b>. Match as many as you can!</p>
+    <button class="btn" id="mStart" style="margin-top:14px">GO!</button>`;
+  $('mStart').onclick = matchCountdown;
+}
+function matchCountdown() {
+  const ov = $('mOverlay'), g = mGame;
+  let n = 3;
+  const tick = () => {
+    if (g !== mGame || mPhase !== 'ready') return;
+    if (n > 0) { ov.innerHTML = `<div class="big">${n}</div>`; sfx.tick(); n--; setTimeout(tick, 700); }
+    else {
+      ov.innerHTML = '<div class="big">GO!</div>'; sfx.go(); setTimeout(() => ov.classList.add('hide'), 350);
+      mPhase = 'play';
+      mInt = setInterval(() => { mLeft -= .1; updMatchHud(); if (mLeft <= 0) endMatch(); }, 100);
+    }
+  };
+  tick();
+}
+function updMatchHud() {
+  $('mCount').textContent = `${mRight} matched`;
+  $('mScore').textContent = `${mPts} pts`;
+  const s = Math.max(0, Math.ceil(mLeft)), f = Math.max(0, mLeft) / CONFIG.matchSeconds;
+  $('mTime').textContent = s + 's';
+  $('mBar').style.width = (f * 100) + '%';
+  $('mBar').style.background = s <= 10 ? 'var(--bad)' : 'var(--accent2)';
+  if (s !== mLastSec) { mLastSec = s; if (mPhase === 'play' && s <= 5 && s > 0) sfx.tick(); }
+}
+function newRound() {
+  if (mPool.length < CONFIG.matchPerRound) mPool = shuffle(PAIRS);
+  mSet = mPool.splice(0, CONFIG.matchPerRound); mSel = null; mLocked = false;
+  const ids = mSet.map((_, i) => i);
+  const col = (side, order) => `<div class="mcol">` + order.map(i =>
+    `<button class="tile ${side}" data-side="${side}" data-id="${i}">${esc(mSet[i][side === 'term' ? 0 : 1])}</button>`).join('') + `</div>`;
+  $('mGrid').innerHTML = col('term', shuffle(ids)) + col('def', shuffle(ids));
+  $('mGrid').querySelectorAll('.tile').forEach(t => t.onclick = () => tileClick(t));
+}
+function tileClick(el) {
+  if (mPhase !== 'play' || mLocked || el.classList.contains('ok')) return;
+  if (!mSel) { mSel = el; el.classList.add('sel'); sfx.tick(); return; }
+  if (mSel === el) { el.classList.remove('sel'); mSel = null; return; }
+  if (mSel.dataset.side === el.dataset.side) { mSel.classList.remove('sel'); mSel = el; el.classList.add('sel'); sfx.tick(); return; }
+  const a = mSel; mSel = null; a.classList.remove('sel');
+  if (a.dataset.id === el.dataset.id) {
+    a.classList.add('ok'); el.classList.add('ok');
+    mRight++; mStreak++; const pts = comboPts(mStreak); mPts += pts; sfx.good();
+    $('mHint').innerHTML = mStreak >= 2 ? `🔥 <b>${mStreak} in a row!</b> +${pts}` : MATCH_HINT;
+    updMatchHud();
+    if (!$('mGrid').querySelector('.tile:not(.ok)')) { mLocked = true; mLater(newRound, 550); }
+  } else {
+    mStreak = 0; mLeft -= CONFIG.matchPenalty; mLocked = true; sfx.bad(); hitPill('mTime');
+    a.classList.add('no'); el.classList.add('no');
+    $('mHint').innerHTML = `❌ Not a match: <b>-${CONFIG.matchPenalty}s</b>`;
+    updMatchHud();
+    mLater(() => { a.classList.remove('no'); el.classList.remove('no'); mLocked = false; }, 400);
+  }
+}
+function endMatch() {
+  clearInterval(mInt); mPhase = 'done'; mLeft = 0; updMatchHud(); sfx.end();
+  const g = mGame, n = mRight, pts = mPts;
+  $('mOverlay').className = 'overlay';
+  $('mOverlay').innerHTML = `<h2>⏱ Time's up!</h2><p>You matched ${n} pair${n === 1 ? '' : 's'}.</p>`;
+  setTimeout(() => { if (g === mGame) showEnd({
+    kind: 'match', title: "Time's up!", big: n, label: `${n === 1 ? 'pair' : 'pairs'} matched · ${pts} points`,
+    score: pts, tiers: CONFIG.matchTiers, tierValue: n,
+  }); }, 1400);
+}
+
+/* ============ PACK IT ============ */
+// Packaging options. `r` is the rule shown on the button.
+const PACKS = [
+  { id: 'env',  e: '✉️', n: 'Document Envelope',       r: 'Flat papers & cards · up to 0.5 kg' },
+  { id: 'poly', e: '🛍️', n: 'Poly Bag',                r: 'Soft goods that cannot break · up to 3 kg' },
+  { id: 'mail', e: '📬', n: 'Padded Mailer',           r: 'Small, light, valuable items · up to 1 kg' },
+  { id: 'box',  e: '📦', n: 'Carton Box',              r: 'Sturdy, non-breakable goods · up to 15 kg' },
+  { id: 'frag', e: '🫧', n: 'Bubble-wrap Fragile Box', r: 'Anything breakable · up to 8 kg' },
+  { id: 'cool', e: '🧊', n: 'Insulated Cooler Bag',    r: 'Hot or cold food & medicine · up to 5 kg' },
+];
+// e emoji, n name, d description, v value (₦), w weight (kg), s size, h handling note,
+// hk handling style (frag|cold|hot|norm), a correct pack id, why shown after answering.
+const ITEMS = [
+  // documents -> envelope
+  { e: '📄', n: 'Signed Contract', d: 'Three printed pages signed by both parties. Must arrive uncreased.', v: 200000, w: .1, s: 'Flat', h: 'Keep flat & dry', hk: 'norm', a: 'env', why: 'Flat papers go in a document envelope: light, flat and protected from creasing.' },
+  { e: '🎓', n: 'Degree Certificate', d: 'Original certificate on thick paper. No frame, no tube.', v: 50000, w: .2, s: 'Flat', h: 'Keep flat & dry', hk: 'norm', a: 'env', why: 'An unframed certificate is just flat paper, so an envelope does the job.' },
+  { e: '💌', n: 'Wedding Invitations', d: '40 printed cards for a wedding this Saturday.', v: 20000, w: .4, s: 'Flat', h: 'Keep flat & dry', hk: 'norm', a: 'env', why: 'Cards are flat and light (0.4 kg), ideal for an envelope.' },
+  { e: '🛂', n: 'Visa Application Papers', d: 'Forms and passport photos to be handed in at an embassy.', v: 30000, w: .15, s: 'Flat', h: 'Keep flat & dry', hk: 'norm', a: 'env', why: 'Loose papers and photos need a flat, dry envelope.' },
+  // small valuables -> padded mailer
+  { e: '💍', n: 'Engagement Ring', d: 'Gold ring in a small velvet pouch. Valuable, tiny, not breakable.', v: 350000, w: .05, s: 'Small', h: 'Valuable: seal it', hk: 'norm', a: 'mail', why: 'Small, light and valuable: a padded mailer cushions it and can be sealed.' },
+  { e: '🔑', n: 'Car Key Fob', d: 'Spare electronic key. Costly to replace and easy to lose.', v: 60000, w: .1, s: 'Small', h: 'Valuable: seal it', hk: 'norm', a: 'mail', why: 'A tiny, light item with some value fits a padded mailer.' },
+  { e: '🎧', n: 'Earbuds & Charger', d: 'Wireless earbuds in a slim box plus a charging cable.', v: 28000, w: .3, s: 'Small', h: 'Light cushioning', hk: 'norm', a: 'mail', why: 'Small electronics under 1 kg travel well in a padded mailer.' },
+  { e: '💾', n: 'Memory Cards (3)', d: 'Three SD cards holding a client\'s event photos.', v: 15000, w: .03, s: 'Small', h: 'Keep from bending', hk: 'norm', a: 'mail', why: 'Tiny and light, but worth protecting: padded mailer.' },
+  { e: '📱', n: 'Phone Case Set', d: 'Silicone phone case and a pop socket.', v: 6000, w: .2, s: 'Small', h: 'Light cushioning', hk: 'norm', a: 'mail', why: 'Small, light accessories fit a padded mailer.' },
+  { e: '🔋', n: 'Power Bank', d: 'Slim 10,000 mAh power bank in a soft sleeve.', v: 18000, w: .45, s: 'Small', h: 'Light cushioning', hk: 'norm', a: 'mail', why: 'Under 1 kg and compact: a padded mailer is enough.' },
+  // soft goods -> poly bag
+  { e: '👕', n: 'T-shirts (pack of 3)', d: 'Folded cotton tees. Washable and soft.', v: 12000, w: .6, s: 'Medium', h: 'Normal handling', hk: 'norm', a: 'poly', why: 'Soft clothes under 3 kg need only a poly bag.' },
+  { e: '🧣', n: 'Ankara Fabric', d: 'Two yards of cloth, folded. Nothing breakable.', v: 15000, w: 1.2, s: 'Medium', h: 'Keep dry', hk: 'norm', a: 'poly', why: 'Fabric is soft and light: poly bag.' },
+  { e: '👗', n: 'Folded Dress', d: 'Cotton dress, newly ironed. Customer wants it clean.', v: 22000, w: .8, s: 'Medium', h: 'Keep clean & dry', hk: 'norm', a: 'poly', why: 'Soft, not breakable, under 3 kg: a poly bag keeps it clean.' },
+  { e: '🧢', n: 'Branded Caps (5)', d: 'Five soft cotton caps for a staff event.', v: 10000, w: .7, s: 'Medium', h: 'Normal handling', hk: 'norm', a: 'poly', why: 'Soft goods go in a poly bag.' },
+  { e: '🧸', n: 'Plush Teddy Bear', d: 'Squashy soft toy, a birthday gift.', v: 8000, w: .6, s: 'Medium', h: 'Keep clean', hk: 'norm', a: 'poly', why: 'Soft, light and unbreakable: poly bag.' },
+  { e: '👖', n: 'Jeans (3 pairs)', d: 'Three pairs of folded denim.', v: 36000, w: 2.4, s: 'Medium', h: 'Normal handling', hk: 'norm', a: 'poly', why: 'Soft goods at 2.4 kg are still within a poly bag\'s 3 kg limit.' },
+  // sturdy / heavy -> carton
+  { e: '👟', n: 'Running Sneakers', d: 'Pair of running shoes in their shoebox.', v: 45000, w: 1.4, s: 'Medium', h: 'Normal handling', hk: 'norm', a: 'box', why: 'Boxed shoes keep their shape best in a sturdy carton.' },
+  { e: '📚', n: 'Textbooks (5)', d: 'Five hardcover textbooks. Heavy, but nothing breakable.', v: 30000, w: 4.5, s: 'Medium', h: 'Normal handling', hk: 'norm', a: 'box', why: 'Heavy, non-breakable goods need a strong carton.' },
+  { e: '🧰', n: 'Steel Tool Kit', d: 'Wrenches and screwdrivers in a metal case.', v: 38000, w: 7, s: 'Medium', h: 'Normal handling', hk: 'norm', a: 'box', why: 'At 7 kg it is too heavy for bags or mailers: carton.' },
+  { e: '🍚', n: 'Rice (10 kg bag)', d: 'Sealed bag of rice. A thin bag would split on the bike.', v: 18000, w: 10, s: 'Large', h: 'Keep dry', hk: 'norm', a: 'box', why: 'Heavy and not breakable: a carton protects the bag.' },
+  { e: '🥫', n: 'Canned Drinks (12)', d: 'Twelve aluminium cans. Dent-proof packaging helps.', v: 9000, w: 4.5, s: 'Medium', h: 'Normal handling', hk: 'norm', a: 'box', why: 'Metal cans aren\'t breakable but are heavy: carton.' },
+  { e: '🛏️', n: 'Duvet & Bedsheet Set', d: 'Bulky soft bedding set for a double bed.', v: 40000, w: 5, s: 'Large', h: 'Keep dry', hk: 'norm', a: 'box', why: 'Soft, but 5 kg is over the poly bag limit of 3 kg: carton.' },
+  { e: '🍳', n: 'Frying Pan Set', d: 'Three stacked non-stick metal pans.', v: 25000, w: 5, s: 'Medium', h: 'Normal handling', hk: 'norm', a: 'box', why: 'Heavy metal cookware is sturdy: carton.' },
+  // breakable -> fragile box
+  { e: '🍷', n: 'Wine Glasses (6)', d: 'Set of six crystal glasses.', v: 30000, w: 3, s: 'Medium', h: 'FRAGILE', hk: 'frag', a: 'frag', why: 'Glass needs bubble wrap and a FRAGILE label.' },
+  { e: '🖼️', n: 'Framed Portrait', d: 'Wedding photo in a wooden frame with a glass front.', v: 45000, w: 2, s: 'Large', h: 'FRAGILE', hk: 'frag', a: 'frag', why: 'Glass-fronted frame: bubble wrap and a fragile box.' },
+  { e: '💻', n: 'Laptop', d: 'Brand-new 15-inch laptop. Expensive and easily damaged.', v: 650000, w: 2.2, s: 'Medium', h: 'FRAGILE electronics', hk: 'frag', a: 'frag', why: 'High-value electronics need maximum cushioning.' },
+  { e: '🏺', n: 'Ceramic Vase', d: 'Hand-painted decorative vase.', v: 40000, w: 2.5, s: 'Medium', h: 'FRAGILE', hk: 'frag', a: 'frag', why: 'Ceramics crack easily: bubble wrap and fragile box.' },
+  { e: '📷', n: 'DSLR Camera', d: 'Camera body with a glass lens attached.', v: 420000, w: 1.2, s: 'Medium', h: 'FRAGILE electronics', hk: 'frag', a: 'frag', why: 'Delicate and costly: the lens could crack, so cushion it fully.' },
+  { e: '🧴', n: 'Perfume Bottles (3)', d: 'Three glass spray bottles. Small and light, but breakable.', v: 55000, w: 1, s: 'Small', h: 'FRAGILE glass', hk: 'frag', a: 'frag', why: 'Small and light, but glass breaks. Breakable always beats size and weight.' },
+  { e: '🥚', n: 'Eggs (tray of 30)', d: 'Farm-fresh eggs for a bakery.', v: 5500, w: 2, s: 'Medium', h: 'FRAGILE', hk: 'frag', a: 'frag', why: 'Cheap, but they crack at every bump: fragile box.' },
+  { e: '🍯', n: 'Honey Jars (2)', d: 'Two glass jars of raw honey.', v: 3000, w: 1.4, s: 'Small', h: 'FRAGILE glass', hk: 'frag', a: 'frag', why: 'Low value doesn\'t mean low risk: glass still needs bubble wrap.' },
+  // hot / cold -> cooler
+  { e: '🍦', n: 'Ice Cream Tub', d: 'Two-litre tub that melts in minutes.', v: 6500, w: 1.8, s: 'Medium', h: 'Keep frozen', hk: 'cold', a: 'cool', why: 'Melting food needs an insulated cooler bag.' },
+  { e: '💉', n: 'Insulin Pens', d: 'Diabetes medicine that spoils if it gets warm.', v: 45000, w: .4, s: 'Small', h: 'Keep cold', hk: 'cold', a: 'cool', why: 'Medicine that must stay cold goes in a cooler bag, even if small and light.' },
+  { e: '🍲', n: 'Party Jollof Rice (4)', d: 'Four portions, still steaming hot.', v: 14000, w: 2.4, s: 'Medium', h: 'Keep hot', hk: 'hot', a: 'cool', why: 'Insulation keeps food hot as well as cold.' },
+  { e: '🐟', n: 'Frozen Fish (3 kg)', d: 'Fresh fish, frozen for a restaurant.', v: 12000, w: 3, s: 'Medium', h: 'Keep frozen', hk: 'cold', a: 'cool', why: 'Frozen goods need a cooler bag to stay frozen.' },
+  { e: '🍰', n: 'Fresh Cream Cake', d: 'Birthday cake with cream icing.', v: 25000, w: 1.8, s: 'Medium', h: 'Keep cool', hk: 'cold', a: 'cool', why: 'Cream melts in the heat: cooler bag.' },
+  { e: '🥛', n: 'Yoghurt Pack (6)', d: 'Six chilled drinking yoghurts.', v: 5000, w: 2.2, s: 'Medium', h: 'Keep cold', hk: 'cold', a: 'cool', why: 'Dairy spoils when warm: cooler bag.' },
+];
+const HI = { frag: '⚠️', cold: '❄️', hot: '🔥', norm: '✅' };
+const fmtN = n => '₦' + n.toLocaleString('en-US');
+
+let pQueue = [], pCur = null, pRight = 0, pPts = 0, pStreak = 0, pLeft = 0, pNum = 0;
+let pInt, pPhase = 'idle', pLocked = true, pBike = null, pGame = 0, pLastSec = -1;
+function pLater(fn, ms) { const g = pGame; setTimeout(() => { if (g === pGame && pPhase === 'play') fn(); }, ms); }
+function stopPack() { pPhase = 'idle'; pGame++; clearInterval(pInt); }
+function startPack() {
+  stopPack();
+  pQueue = shuffle(ITEMS); pCur = null; pRight = 0; pPts = 0; pStreak = 0; pNum = 0;
+  pLeft = CONFIG.packSeconds; pPhase = 'ready'; pLocked = true; pBike = null; pLastSec = -1;
+  show('pack');
+  $('pLane').querySelectorAll('.bike,.stamp').forEach(n => n.remove());
+  $('pReq').className = 'req'; $('pReq').innerHTML = ''; $('pExplain').innerHTML = '';
+  $('pOpts').className = 'packs';
+  $('pOpts').innerHTML = PACKS.map((p, i) =>
+    `<button class="pk" data-i="${i}"><span class="pe">${p.e}</span><span><b><kbd>${i + 1}</kbd>${p.n}</b><small>${p.r}</small></span></button>`).join('');
+  $('pOpts').querySelectorAll('.pk').forEach(b => b.onclick = () => choosePack(+b.dataset.i));
+  updPackHud();
+  const ov = $('pOverlay');
+  ov.className = 'overlay';
+  ov.innerHTML = `<h2>📦 Pack It!</h2>
+    <p>Each order shows its <b>description, value, weight, size</b> and <b>handling</b> needs.<br>
+    Pick the right packaging and a bike rides it out. A wrong choice costs <b>${CONFIG.packPenalty} seconds</b>.<br>
+    You have <b>${CONFIG.packSeconds} seconds</b>. Keys <b>1-6</b> also work.</p>
+    <button class="btn" id="pStart" style="margin-top:14px">GO!</button>`;
+  $('pStart').onclick = packCountdown;
+}
+function packCountdown() {
+  const ov = $('pOverlay'), g = pGame;
+  let n = 3;
+  const tick = () => {
+    if (g !== pGame || pPhase !== 'ready') return;
+    if (n > 0) { ov.innerHTML = `<div class="big">${n}</div>`; sfx.tick(); n--; setTimeout(tick, 700); }
+    else {
+      ov.innerHTML = '<div class="big">GO!</div>'; sfx.go(); setTimeout(() => ov.classList.add('hide'), 350);
+      pPhase = 'play';
+      pInt = setInterval(() => { pLeft -= .1; updPackHud(); if (pLeft <= 0) endPack(); }, 100);
+      nextRequest(true);
+    }
+  };
+  tick();
+}
+function updPackHud() {
+  $('pCount').textContent = `🛵 ${pRight} dispatched`;
+  $('pScore').textContent = `${pPts} pts`;
+  const s = Math.max(0, Math.ceil(pLeft)), f = Math.max(0, pLeft) / CONFIG.packSeconds;
+  $('pTime').textContent = s + 's';
+  $('pBar').style.width = (f * 100) + '%';
+  $('pBar').style.background = s <= 10 ? 'var(--bad)' : 'var(--accent2)';
+  if (s !== pLastSec) { pLastSec = s; if (pPhase === 'play' && s <= 5 && s > 0) sfx.tick(); }
+}
+function spawnBike(delay) {
+  const b = document.createElement('div');
+  b.className = 'bike in'; b.style.animationDelay = delay + 's';
+  b.innerHTML = '<span class="cargo"></span><span class="ride">🛵</span>';
+  $('pLane').appendChild(b); pBike = b;
+}
+function dispatchBike(emoji) {
+  const b = pBike; if (!b) return;
+  pBike = null;
+  b.querySelector('.cargo').textContent = emoji;
+  b.style.animationDelay = '';
+  b.classList.remove('in', 'nope'); b.classList.add('out');
+  b.addEventListener('animationend', () => b.remove());
+}
+function stamp(text, ok) {
+  const s = document.createElement('div');
+  s.className = 'stamp' + (ok ? ' ok' : ''); s.textContent = text;
+  $('pLane').appendChild(s); setTimeout(() => s.remove(), 1100);
+}
+function nextRequest(first) {
+  if (!pQueue.length) pQueue = shuffle(ITEMS);
+  const it = pCur = pQueue.pop(); pNum++; pLocked = false;
+  const r = $('pReq');
+  r.className = 'req'; void r.offsetWidth; r.classList.add('pop');
+  r.innerHTML = `<div class="req-emoji">${it.e}</div><div class="req-body">
+    <div class="req-tag">NEW REQUEST #${pNum}</div>
+    <div class="req-name">${esc(it.n)}</div>
+    <div class="req-desc">${esc(it.d)}</div>
+    <div class="chips"><span class="chip">💰 ${fmtN(it.v)}</span><span class="chip">⚖️ ${it.w} kg</span>
+      <span class="chip">📏 ${it.s}</span><span class="chip ${it.hk}">${HI[it.hk]} ${esc(it.h)}</span></div></div>`;
+  $('pOpts').classList.remove('locked');
+  $('pOpts').querySelectorAll('.pk').forEach(b => b.className = 'pk');
+  if (!pBike) spawnBike(first ? 0 : .25);
+}
+function choosePack(i) {
+  if (pLocked || pPhase !== 'play' || !PACKS[i]) return;
+  pLocked = true; $('pOpts').classList.add('locked');
+  const it = pCur, pick = PACKS[i], ok = pick.id === it.a, btns = $('pOpts').querySelectorAll('.pk');
+  if (ok) {
+    pRight++; pStreak++; const pts = comboPts(pStreak); pPts += pts; sfx.deliver();
+    btns[i].classList.add('right');
+    dispatchBike(pick.e); stamp(`DISPATCHED +${pts}`, true);
+    $('pExplain').innerHTML = `<b>✅ ${esc(pick.n)} was right.</b> ${esc(it.why)}`;
+    pLater(nextRequest, 750);
+  } else {
+    pStreak = 0; pLeft -= CONFIG.packPenalty; sfx.bad(); hitPill('pTime');
+    btns[i].classList.add('wrong'); btns[PACKS.findIndex(p => p.id === it.a)].classList.add('right');
+    $('pReq').className = 'req bad';
+    if (pBike) { pBike.classList.remove('in'); pBike.style.animationDelay = ''; void pBike.offsetWidth; pBike.classList.add('nope'); }
+    stamp(`RETURNED -${CONFIG.packPenalty}s`, false);
+    $('pExplain').innerHTML = `<b>❌ ${esc(pick.n)} won't work.</b> ${esc(it.why)}`;
+    pLater(nextRequest, 2300);
+  }
+  updPackHud();
+}
+function endPack() {
+  clearInterval(pInt); pPhase = 'done'; pLeft = 0; updPackHud(); sfx.end();
+  const g = pGame, n = pRight, pts = pPts;
+  $('pOverlay').className = 'overlay';
+  $('pOverlay').innerHTML = `<h2>⏱ Time's up!</h2><p>You sent out ${n} parcel${n === 1 ? '' : 's'}.</p>`;
+  setTimeout(() => { if (g === pGame) showEnd({
+    kind: 'pack', title: "Shift over!", big: n, label: `${n === 1 ? 'parcel' : 'parcels'} dispatched · ${pts} points`,
+    score: pts, tiers: CONFIG.packTiers, tierValue: n,
+  }); }, 1400);
+}
+document.addEventListener('keydown', e => {
+  if ($('pack').classList.contains('active') && /^[1-6]$/.test(e.key)) choosePack(+e.key - 1);
+});
+
 /* ============ BOOT ============ */
 document.querySelectorAll('.bn,#brandName').forEach(el => el.textContent = CONFIG.brand);
 $('playQuiz').onclick = startQuiz;
 $('playRider').onclick = startRider;
-// booth admin: Ctrl+Shift+L clears both leaderboards, Esc returns home
+$('playMatch').onclick = startMatch;
+$('playPack').onclick = startPack;
+// booth admin: Ctrl+Shift+L clears all leaderboards, Esc returns home
 document.addEventListener('keydown', e => {
   if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'l') {
-    if (confirm('Clear ALL leaderboard scores?')) { localStorage.removeItem(LB_KEYS.rider); localStorage.removeItem(LB_KEYS.quiz); renderBoards(); }
+    if (confirm('Clear ALL leaderboard scores?')) { Object.values(LB_KEYS).forEach(k => localStorage.removeItem(k)); renderBoards(); }
   }
   if (e.key === 'Escape' && !$('home').classList.contains('active') && document.activeElement !== $('eName')) goHome();
 });
