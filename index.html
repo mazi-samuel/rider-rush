@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Routag Delivery Challenge</title>
 <meta name="description" content="Logistics games: quiz, rider rush, word match, pack it and route planner.">
-<meta name="theme-color" content="#0b1220">
+<meta name="theme-color" content="#f3f6fc" id="metaTheme">
+<script>try{var t=JSON.parse(localStorage.getItem('routag_theme'));document.documentElement.dataset.theme=t==='dark'?'dark':'light'}catch(e){document.documentElement.dataset.theme='light'}</script>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,16 +16,29 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <style>
 :root{
+  --pad-t:clamp(12px,calc(2.4*var(--vh,1vh)),28px);
+  --bg:#f3f6fc; --panel:#ffffff; --panel2:#e9effa; --line:#cdd8ee;
+  --text:#14213d; --muted:#56688a;
+  --accent:#ff6a1a; --accent2:#0b9c75; --bad:#d93245; --gold:#a8720a;
+  --glow:#ffe2cf; --overlay:#f3f6fcdd; --right-bg:#d3f4e8; --wrong-bg:#fcdadf; --sel-bg:#fff0c2;
+  --ghost-sh:#b9c6e0; --stamp-bg:#fffffff2; --chip-frag:#c0283b; --chip-cold:#1768ad; --chip-hot:#c2500b;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
   --bg:#0b1220; --panel:#131d33; --panel2:#1b2845; --line:#2a3a5e;
   --text:#eef3ff; --muted:#93a3c7;
-  --accent:#ff6a1a; --accent2:#19d3a2; --bad:#ff4d5e; --gold:#ffc83d;
+  --accent2:#19d3a2; --bad:#ff4d5e; --gold:#ffc83d;
+  --glow:#1c2b52; --overlay:#0b1220cc; --right-bg:#0f6b53; --wrong-bg:#6b1f2a; --sel-bg:#3a3520;
+  --ghost-sh:#0d1528; --stamp-bg:#0b1220dd; --chip-frag:#ff9aa5; --chip-cold:#9ad4ff; --chip-hot:#ffb27f;
+  color-scheme:dark;
 }
+@media (max-height:480px){:root{--pad-t:8px}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
   font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;overflow:hidden;user-select:none}
 button{font:inherit;color:inherit;cursor:pointer;border:0}
-.screen{position:fixed;inset:0;display:none;flex-direction:column;padding:clamp(12px,calc(2.4*var(--vh,1vh)),28px) clamp(14px,3vw,40px);
-  background:radial-gradient(1200px 700px at 80% -10%,#1c2b52 0,transparent 60%),var(--bg);overflow:auto}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;padding:var(--pad-t) clamp(14px,3vw,40px);
+  background:radial-gradient(1200px 700px at 80% -10%,var(--glow) 0,transparent 60%),var(--bg);overflow:auto}
 .screen.active{display:flex}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;color:var(--accent)}
 .brand i{font-style:normal;background:var(--accent);color:#fff;border-radius:8px;padding:2px 9px;letter-spacing:0}
@@ -57,7 +71,7 @@ h1 span{color:var(--accent)}
 .lbhead span{color:var(--muted);font-weight:600;font-size:13px}
 .lbhead span b{color:var(--gold)}
 .lb ol{margin:4px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));column-gap:22px}
-.lb li{display:flex;justify-content:space-between;gap:10px;padding:2px 0;border-bottom:1px dashed #22305299;font-size:15px}
+.lb li{display:flex;justify-content:space-between;gap:10px;padding:2px 0;border-bottom:1px dashed var(--line);font-size:15px}
 .lb li b{color:var(--accent2)}
 .lb .empty{color:var(--muted);font-style:italic;border:0}
 @media (max-height:480px){.lb li:nth-child(n+4){display:none}}
@@ -74,8 +88,8 @@ h1 span{color:var(--accent)}
 .btn{background:var(--accent);color:#fff;font-weight:800;border-radius:16px;padding:.7em 1.6em;font-size:clamp(16px,calc(2.6*var(--vh,1vh)),26px);
   box-shadow:0 6px 0 #b8470a;transition:transform .08s,box-shadow .08s}
 .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b8470a}
-.btn.ghost{background:var(--panel2);box-shadow:0 6px 0 #0d1528;color:var(--text)}
-.btn.ghost:active{box-shadow:0 2px 0 #0d1528}
+.btn.ghost{background:var(--panel2);box-shadow:0 6px 0 var(--ghost-sh);color:var(--text)}
+.btn.ghost:active{box-shadow:0 2px 0 var(--ghost-sh)}
 .center{margin:auto;text-align:center;max-width:900px;width:100%}
 
 /* quiz */
@@ -87,15 +101,15 @@ h1 span{color:var(--accent)}
   text-align:left;font-size:clamp(16px,calc(2.8*var(--vh,1vh)),28px);font-weight:600;display:flex;gap:12px;align-items:center;transition:transform .1s}
 .opt:hover{border-color:var(--accent)}
 .opt kbd{background:var(--panel);border-radius:8px;padding:.1em .55em;color:var(--accent);font-weight:800;font-family:inherit}
-.opt.right{background:#0f6b53;border-color:var(--accent2)}
-.opt.wrong{background:#6b1f2a;border-color:var(--bad)}
+.opt.right{background:var(--right-bg);border-color:var(--accent2)}
+.opt.wrong{background:var(--wrong-bg);border-color:var(--bad)}
 .opt.dim{opacity:.45}
 .opt:disabled{cursor:default}
 .explain{min-height:3.2em;margin-top:clamp(8px,calc(1.6*var(--vh,1vh)),18px);color:var(--muted);font-size:clamp(14px,calc(2.3*var(--vh,1vh)),22px)}
 .explain b{color:var(--text)}
 
 /* rider */
-#rider{padding:8px 10px}
+#rider{padding:var(--pad-t) clamp(14px,3vw,40px) 8px}
 .hud{display:flex;align-items:center;gap:12px}
 .hud .score{font-size:clamp(20px,calc(4*var(--vh,1vh)),40px);font-weight:900;color:var(--accent2);min-width:3.4em}
 .hud .score small{font-size:.45em;color:var(--muted);font-weight:700;display:block;margin-top:-4px}
@@ -106,7 +120,7 @@ h1 span{color:var(--accent)}
 .stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
 canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius:14px}
 .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:#0b1220cc;backdrop-filter:blur(6px);border-radius:14px;text-align:center;padding:20px;z-index:3}
+  background:var(--overlay);backdrop-filter:blur(6px);border-radius:14px;text-align:center;padding:20px;z-index:3}
 .overlay.hide{display:none}
 .overlay .big{font-size:clamp(70px,calc(22*var(--vh,1vh)),220px);font-weight:900;color:var(--accent)}
 .overlay h2{font-size:clamp(24px,calc(5*var(--vh,1vh)),50px);margin:.2em 0}
@@ -130,8 +144,14 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
 .namerow input:focus{outline:0;border-color:var(--accent)}
 .rank{color:var(--gold);font-weight:800;min-height:1.4em;font-size:clamp(15px,calc(2.4*var(--vh,1vh)),24px)}
 .actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:12px}
-.mute{position:fixed;right:10px;bottom:8px;z-index:5;background:var(--panel);border:1px solid var(--line);
-  border-radius:99px;padding:.3em .8em;font-size:14px;opacity:.7}
+.tools{position:fixed;top:var(--pad-t);right:clamp(14px,3vw,40px);z-index:6;display:flex;gap:6px}
+.tool{width:30px;height:30px;padding:0;display:grid;place-items:center;border-radius:50%;background:var(--panel);
+  border:1px solid var(--line);font-size:15px;line-height:1;box-shadow:0 1px 4px #0003}
+.tool:hover{border-color:var(--accent)}
+.topbar,.hhead,.hud{padding-right:78px}
+.installbar{display:block;width:100%;margin-top:8px;background:var(--panel);border:1px dashed var(--accent);border-radius:14px;
+  padding:.4em 1em;font-weight:700;font-size:14px;color:var(--text)}
+.installbar[hidden]{display:none}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 @keyframes hit{0%,100%{background:var(--panel)}30%{background:var(--bad)}}
 .pill.hit{animation:hit .6s}
@@ -146,11 +166,11 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
   min-height:clamp(46px,calc(8*var(--vh,1vh)),76px);display:flex;align-items:center;justify-content:center;text-align:center;
   transition:transform .1s,border-color .1s,background .2s,opacity .3s}
 .tile.term{color:var(--accent);font-weight:800;font-size:clamp(15px,calc(2.8*var(--vh,1vh)),26px)}
-.tile.def{color:#dbe5ff;font-weight:600;font-size:clamp(12px,calc(2.1*var(--vh,1vh)),20px);line-height:1.2}
+.tile.def{color:var(--text);font-weight:600;font-size:clamp(12px,calc(2.1*var(--vh,1vh)),20px);line-height:1.2}
 .tile:hover{border-color:var(--accent)}
-.tile.sel{border-color:var(--gold);background:#3a3520;transform:scale(1.03)}
-.tile.ok{background:#0f6b53;border-color:var(--accent2);opacity:.5;pointer-events:none}
-.tile.no{background:#6b1f2a;border-color:var(--bad);animation:shake .35s}
+.tile.sel{border-color:var(--gold);background:var(--sel-bg);transform:scale(1.03)}
+.tile.ok{background:var(--right-bg);border-color:var(--accent2);opacity:.5;pointer-events:none}
+.tile.no{background:var(--wrong-bg);border-color:var(--bad);animation:shake .35s}
 
 /* pack it */
 .lane{position:relative;height:clamp(66px,calc(11*var(--vh,1vh)),104px);background:#3b4560;border:2px solid var(--line);
@@ -167,7 +187,7 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
 @keyframes bikeIn{from{left:-14%}to{left:6%}}
 @keyframes bikeOut{from{left:6%}to{left:108%}}
 .stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-5deg);border:3px solid var(--bad);
-  color:var(--bad);background:#0b1220dd;font-weight:900;letter-spacing:.08em;padding:.1em .7em;border-radius:8px;
+  color:var(--bad);background:var(--stamp-bg);font-weight:900;letter-spacing:.08em;padding:.1em .7em;border-radius:8px;
   font-size:clamp(14px,calc(2.8*var(--vh,1vh)),26px);white-space:nowrap;animation:stamp .25s ease-out}
 .stamp.ok{border-color:var(--accent2);color:var(--accent2)}
 @keyframes stamp{from{transform:translate(-50%,-50%) rotate(-5deg) scale(1.8);opacity:0}}
@@ -184,9 +204,9 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
 .req-desc{color:var(--muted);font-size:clamp(13px,calc(2.2*var(--vh,1vh)),20px);margin:4px 0 8px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:.2em .8em;font-weight:700;font-size:clamp(12px,calc(2*var(--vh,1vh)),18px)}
-.chip.frag{border-color:var(--bad);color:#ff9aa5}
-.chip.cold{border-color:#5ab8ff;color:#9ad4ff}
-.chip.hot{border-color:var(--accent);color:#ffb27f}
+.chip.frag{border-color:var(--bad);color:var(--chip-frag)}
+.chip.cold{border-color:#5ab8ff;color:var(--chip-cold)}
+.chip.hot{border-color:var(--accent);color:var(--chip-hot)}
 .packs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,1.4vw,16px);margin-top:clamp(8px,calc(1.6*var(--vh,1vh)),16px)}
 .packs.locked .pk{pointer-events:none}
 .pk{min-width:0;background:var(--panel2);border:2px solid var(--line);border-radius:16px;padding:clamp(8px,calc(1.5*var(--vh,1vh)),16px);
@@ -196,8 +216,8 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
 .pk b{display:block;font-size:clamp(14px,calc(2.4*var(--vh,1vh)),22px)}
 .pk small{display:block;color:var(--muted);font-size:clamp(11px,calc(1.8*var(--vh,1vh)),15px);line-height:1.25;margin-top:2px}
 .pk kbd{background:var(--panel);border-radius:6px;padding:0 .4em;margin-right:.35em;color:var(--accent);font-family:inherit}
-.pk.right{background:#0f6b53;border-color:var(--accent2)}
-.pk.wrong{background:#6b1f2a;border-color:var(--bad)}
+.pk.right{background:var(--right-bg);border-color:var(--accent2)}
+.pk.wrong{background:var(--wrong-bg);border-color:var(--bad)}
 
 /* route planner */
 #rcv{cursor:pointer}
@@ -206,8 +226,6 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
 .rtfoot .btn{font-size:clamp(14px,calc(2.2*var(--vh,1vh)),20px);padding:.45em 1.2em}
 .rtfoot .btn[hidden]{display:none}
 
-.install{right:auto;left:10px;opacity:1;font-weight:700;color:var(--text);border-color:var(--accent)}
-.install[hidden]{display:none}
 @media (max-width:700px){.opts{grid-template-columns:1fr}.modes{grid-template-columns:1fr}.mode,.mode:nth-child(n+4){grid-column:auto}.packs{grid-template-columns:repeat(2,minmax(0,1fr))}
   .pk b{font-size:clamp(12px,3.7vw,18px)}.pk small{font-size:clamp(10px,2.8vw,13px)}.pk .pe{font-size:clamp(22px,7vw,34px)}
   .req{min-height:0}.req-emoji{font-size:clamp(40px,calc(8*var(--vh,1vh)),70px)}
@@ -279,6 +297,7 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
     <button class="mode" id="playRoute"><div class="ico">🗺️</div><div class="txt"><h2>Route Planner</h2>
       <p>Plan the shortest route through every stop, then compare with the best.</p><span class="go">Plan routes ▶</span></div></button>
   </div>
+  <button class="installbar" id="install" hidden>📲 Install the app for offline play</button>
   <div class="lb">
     <div class="lbtabs" id="lbTabs"></div>
     <div id="lbBody"></div>
@@ -403,8 +422,10 @@ canvas{width:100%;height:100%;object-fit:contain;touch-action:none;border-radius
   </div>
 </section>
 
-<button class="mute install" id="install" hidden>📲 Install app</button>
-<button class="mute" id="mute" title="Toggle sound">🔊</button>
+<div class="tools">
+  <button class="tool" id="theme" title="Switch light / dark mode" aria-label="Switch light or dark mode">🌙</button>
+  <button class="tool" id="mute" title="Toggle sound" aria-label="Toggle sound">🔊</button>
+</div>
 
 <script>
 // --vh = 1% of the *visible* height (plain vh ignores mobile address bars and overflows the screen)
@@ -666,7 +687,13 @@ const cv = $('cv'), ctx = cv.getContext('2d');
 cv.width = COLS * S; cv.height = ROWS * S;
 const isRoad = (x, y) => x >= 0 && y >= 0 && x < COLS && y < ROWS && (x % 2 === 0 || y % 2 === 0);
 const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
-const BCOL = ['#2c3d66', '#33477a', '#2a4a5e', '#3a3f73', '#2f5266', '#40386b'];
+const isDark = () => document.documentElement.dataset.theme === 'dark';
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const PAL_DARK = { bg: '#10192e', road: '#3b4560', ground: '#2a3a2f', win: '#ffe9a655', dash: '#ffffff30',
+  bld: ['#2c3d66', '#33477a', '#2a4a5e', '#3a3f73', '#2f5266', '#40386b'] };
+const PAL_LIGHT = { bg: '#c9d6ea', road: '#6f7d99', ground: '#9fcfa8', win: '#fff3b0', dash: '#ffffffcc',
+  bld: ['#4d6fb8', '#5c7cc2', '#4a8da6', '#7a6fc0', '#4f9bb0', '#8c6bb5'] };
+const pal = () => isDark() ? PAL_DARK : PAL_LIGHT;
 const bHash = (x, y) => (x * 73856093 ^ y * 19349663) >>> 0;
 
 let R = null, raf = 0, phase = 'idle';
@@ -760,21 +787,21 @@ function drawRider(now) {
   const r = R, g = ctx;
   g.save();
   if (r.shake > 0) g.translate((Math.random() - .5) * 8, (Math.random() - .5) * 8);
-  g.fillStyle = '#10192e'; g.fillRect(0, 0, cv.width, cv.height);
+  const P = pal(); g.fillStyle = P.bg; g.fillRect(0, 0, cv.width, cv.height);
   for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
     if (isRoad(x, y)) {
-      g.fillStyle = '#3b4560'; g.fillRect(x * S, y * S, S, S);
+      g.fillStyle = P.road; g.fillRect(x * S, y * S, S, S);
     } else {
-      g.fillStyle = '#2a3a2f'; g.fillRect(x * S, y * S, S, S);
+      g.fillStyle = P.ground; g.fillRect(x * S, y * S, S, S);
       const h = bHash(x, y), p = 7;
-      g.fillStyle = BCOL[h % BCOL.length];
+      g.fillStyle = P.bld[h % P.bld.length];
       g.beginPath(); g.roundRect(x * S + p, y * S + p, S - 2 * p, S - 2 * p, 8); g.fill();
-      g.fillStyle = '#ffe9a655';
+      g.fillStyle = P.win;
       for (let k = 0; k < 4; k++) if ((h >> k) & 1) g.fillRect(x * S + p + 6 + (k % 2) * 16, y * S + p + 6 + (k >> 1) * 14, 8, 7);
     }
   }
   // lane dashes
-  g.strokeStyle = '#ffffff30'; g.lineWidth = 2; g.setLineDash([8, 10]);
+  g.strokeStyle = P.dash; g.lineWidth = 2; g.setLineDash([8, 10]);
   for (let y = 0; y < ROWS; y += 2) { g.beginPath(); g.moveTo(0, y * S + S / 2); g.lineTo(cv.width, y * S + S / 2); g.stroke(); }
   for (let x = 0; x < COLS; x += 2) { g.beginPath(); g.moveTo(x * S + S / 2, 0); g.lineTo(x * S + S / 2, cv.height); g.stroke(); }
   g.setLineDash([]);
@@ -1343,11 +1370,12 @@ function rtDraw() {
   if (!RT) return;
   const g = rg;
   g.clearRect(0, 0, RW, RH);
-  g.fillStyle = '#1a2740'; g.fillRect(0, 0, RW, RH);
-  g.strokeStyle = '#ffffff0f'; g.lineWidth = 1;
+  const P = isDark() ? { bg: '#1a2740', grid: '#ffffff0f', border: '#2a3a5e', best: '#19d3a2' } : { bg: '#eaf1fb', grid: '#14213d17', border: '#cdd8ee', best: '#0b9c75' };
+  g.fillStyle = P.bg; g.fillRect(0, 0, RW, RH);
+  g.strokeStyle = P.grid; g.lineWidth = 1;
   for (let x = 0; x <= RW; x += 50) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, RH); g.stroke(); }
   for (let y = 0; y <= RH; y += 50) { g.beginPath(); g.moveTo(0, y); g.lineTo(RW, y); g.stroke(); }
-  g.strokeStyle = '#2a3a5e'; g.lineWidth = 4; g.strokeRect(0, 0, RW, RH);
+  g.strokeStyle = P.border; g.lineWidth = 4; g.strokeRect(0, 0, RW, RH);
   if (!RT.stops.length) { drawPin(RT.depot, '🏪', '#ffc83d'); return; }
   const poly = (pts, color, w, dash, upTo = Infinity) => {   // draws up to a distance along the polyline
     g.strokeStyle = color; g.lineWidth = w; g.setLineDash(dash); g.lineJoin = g.lineCap = 'round';
@@ -1361,7 +1389,7 @@ function rtDraw() {
     g.stroke(); g.setLineDash([]);
     return end;
   };
-  if (RT.showBest) poly([RT.depot, ...RT.best.order.map(i => RT.stops[i]), RT.depot], '#19d3a2', 5, [4, 10]);
+  if (RT.showBest) poly([RT.depot, ...RT.best.order.map(i => RT.stops[i]), RT.depot], P.best, 5, [4, 10]);
   const complete = RT.order.length === RT.stops.length;
   let end = null;
   if (RT.order.length) {
@@ -1371,7 +1399,7 @@ function rtDraw() {
   drawPin(RT.depot, '🏪', '#ffc83d');
   RT.stops.forEach((s, i) => {
     const n = RT.order.indexOf(i);
-    drawPin(s, n < 0 ? '🏠' : String(n + 1), n < 0 ? '#93a3c7' : '#ff6a1a', n >= 0);
+    drawPin(s, n < 0 ? '🏠' : String(n + 1), n < 0 ? cssVar('--muted') : '#ff6a1a', n >= 0);
   });
   if (RT.bike != null && end) {
     g.font = '34px "Segoe UI Emoji","Apple Color Emoji",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
@@ -1381,7 +1409,7 @@ function rtDraw() {
 function drawPin(p, label, color, filled) {
   const g = rg, depot = label === '🏪';
   g.beginPath(); g.arc(p.x, p.y, depot ? 26 : 21, 0, 7);
-  g.fillStyle = filled ? color : '#131d33'; g.fill();
+  g.fillStyle = filled ? color : cssVar('--panel'); g.fill();
   g.lineWidth = 3; g.strokeStyle = color; g.stroke();
   g.textAlign = 'center'; g.textBaseline = 'middle';
   if (filled) { g.fillStyle = '#fff'; g.font = '800 20px "Segoe UI",sans-serif'; }
@@ -1410,6 +1438,18 @@ renderBoards();
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
   addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
+// Light / dark mode (light by default). Canvases are redrawn so the change shows immediately.
+function applyTheme(t, save) {
+  document.documentElement.dataset.theme = t;
+  $('theme').textContent = t === 'dark' ? '☀️' : '🌙';
+  $('theme').title = t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+  $('metaTheme').content = t === 'dark' ? '#0b1220' : '#f3f6fc';
+  if (save) store.set('routag_theme', t);
+  if (RT && $('route').classList.contains('active')) rtDraw();
+  if (R && phase !== 'play' && $('rider').classList.contains('active')) drawRider(performance.now());
+}
+applyTheme(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light', false);
+$('theme').onclick = () => applyTheme(isDark() ? 'light' : 'dark', true);
 // Install button: Chrome/Edge/Android use the install prompt; iOS Safari needs the Share menu.
 const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;

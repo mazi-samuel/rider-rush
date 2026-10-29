@@ -1,6 +1,6 @@
 /* Routag service worker: offline-first shell, network-first pages so updates arrive.
    Bump VERSION whenever a cached file changes in a way that must reach installed apps. */
-const VERSION = 'routag-v2';
+const VERSION = 'routag-v3';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png',
